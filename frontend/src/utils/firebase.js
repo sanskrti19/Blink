@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth"; 
  const firebaseConfig = {
-  apiKey: "AIzaSyBc74qvFxeYfu8T3PverA42uTqgdtTkm1g",
+
   authDomain: "blink-9b158.firebaseapp.com",
   projectId: "blink-9b158",
   storageBucket: "blink-9b158.firebasestorage.app",
