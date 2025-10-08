@@ -1,21 +1,18 @@
-// Import the functions you need
+// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+import { getAuth } from "firebase/auth"; 
+ const firebaseConfig = {
+  apiKey: "AIzaSyBc74qvFxeYfu8T3PverA42uTqgdtTkm1g",
+  authDomain: "blink-9b158.firebaseapp.com",
+  projectId: "blink-9b158",
+  storageBucket: "blink-9b158.firebasestorage.app",
+  messagingSenderId: "1015973393721",
+  appId: "1:1015973393721:web:48f0a15f52f90161a3a4e8",
+  measurementId: "G-S7ZKD7606E"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Export services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const auth =getAuth;
+export {auth};
+ 

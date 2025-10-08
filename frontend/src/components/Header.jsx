@@ -1,7 +1,6 @@
 // src/components/Header.jsx
-
 import React from 'react';
-// Assuming you have a globe or similar icon for the app logo/name
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -9,18 +8,16 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           
-          {/* Logo/App Name */}
+          {/* Logo/App Name: Link back to home */}
           <div className="flex-shrink-0 flex items-center">
-            {/* Replace with your actual icon */}
-            <span className="text-2xl font-bold text-gray-800">
+            <Link to="/" className="text-2xl font-bold text-gray-800">
               <span className="text-indigo-600">B</span>LINK
-            </span>
+            </Link>
           </div>
 
-          {/* Navigation Links (If needed, keeping it simple for now) */}
-          {/* Note: In a Notion style, often the landing page is simple, 
-             and main navigation is inside the app. */}
+          {/* Navigation Links */}
           <nav className="hidden md:flex space-x-8">
+            {/* Note: using <a> for hash links to scroll to sections on the same page */}
             <a href="#features" className="text-gray-500 hover:text-indigo-600 transition duration-150 text-sm font-medium">
               Features
             </a>
@@ -28,16 +25,25 @@ const Header = () => {
               About
             </a>
           </nav>
-
-          {/* Login/Sign Up Buttons */}
+ 
+          {/* Login/Sign Up Buttons: Updated to use <Link> to the /login route */}
           <div className="flex items-center space-x-4">
-            {/* The Login component will handle the actual Firebase login logic later */}
-            <button className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition duration-150">
+            
+            {/* 1. Log In Link */}
+            <Link 
+              to="/login" 
+              className="text-sm font-medium text-gray-600 hover:text-indigo-600 transition duration-150"
+            >
               Log in
-            </button>
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300">
+            </Link>
+            
+            {/* 2. Get BLINK Free (Sign Up) Link */}
+            <Link 
+              to="/login" // Directs to the same login page for now
+              className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300"
+            >
               Get BLINK Free
-            </button>
+            </Link>
           </div>
 
         </div>

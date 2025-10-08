@@ -1,7 +1,23 @@
-@import "tailwindcss";
- 
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-/* Optional — smooth fonts + default background */
+
+/* Global Styles for BLINK
+  - Sets up the base typography and background for the Notion aesthetic. 
+*/
 body {
-  @apply bg-[#faf8f5] text-gray-900 font-sans;
+  /* Applying a soft, slightly-off-white background and dark text */
+  /* #faf8f5 is a great, warm off-white (similar to Notion's canvas) */
+  @apply bg-[#faf8f5] text-gray-900 font-sans antialiased;
+}
+
+/* Optional: Improve contrast for selection highlighting */
+::selection {
+  @apply bg-indigo-200 text-indigo-900;
+}
+
+/* Optional: Base styles for clean focus rings, crucial for accessibility */
+:focus {
+  @apply outline-none ring-2 ring-indigo-400 ring-offset-2;
 }
