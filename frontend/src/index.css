@@ -1,3 +1,7 @@
- @tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+ 
+
+/* Optional — smooth fonts + default background */
+body {
+  @apply bg-[#faf8f5] text-gray-900 font-sans;
+}

@@ -2,16 +2,18 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import  bookmarkRoutes from "./routes/bookmarks.js"
+import bookmarkRoutes from "./routes/bookmarks.js"; // import routes AFTER imports
 
-app.use("/api/bookmakrs",bookmarkRoutes);
+dotenv.config(); // load env variables
 
-dotenv.config();
-const app = express();
+const app = express(); // <-- app MUST be declared BEFORE using it
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use("/api/bookmarks", bookmarkRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -20,11 +22,6 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => console.log("MongoDB connected"))
 .catch(err => console.log(err));
-
-// Routes
-app.get("/", (req, res) => {
-  res.send("Blink API is running...");
-});
 
 // Start server
 const PORT = process.env.PORT || 5000;
