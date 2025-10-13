@@ -9,18 +9,18 @@ import Home from './Home'
 const Body = () => {
     const appRouter = createBrowserRouter([
         {
-            // The root path should be your Landing Page
+            
             path: "/",
             element: <LandingPage/>, 
         },
         {
-            // The separate path for your Login form
+             
             path: "/login",
             element: <Login/>,
 
         },
         {
-            // The main app dashboard path
+            
             path: "/home", 
             element: <Home/>
 

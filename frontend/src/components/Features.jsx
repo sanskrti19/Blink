@@ -1,4 +1,4 @@
-// src/components/Features.jsx
+ 
 import React from "react";
 
 export default function Features() {
@@ -6,22 +6,22 @@ export default function Features() {
     {
       title: "Clean, Hierarchical Organization",
       description: "Ditch the chaotic browser folders. Organize links with infinite nested pages, just like in Notion.",
-      icon: "🗂️", // Folder Icon
+      icon: "🗂️",  
     },
     {
       title: "Powerful Tagging & Search",
       description: "Instantly find any link with custom tags and a lightning-fast, full-text search engine.",
-      icon: "🔍", // Search Icon
+      icon: "🔍",  
     },
     {
       title: "One-Click Capture",
       description: "Quickly save any webpage with our Chrome extension, capturing titles and thumbnails automatically.",
-      icon: "🔗", // Link/Capture Icon
+      icon: "🔗", 
     },
   ];
 
   return (
-    // Updated background for better separation from the Hero section
+  
     <section id="features" className="py-24 px-6 bg-white border-t border-gray-100 text-center">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
@@ -35,10 +35,10 @@ export default function Features() {
           {features.map((feature, index) => (
             <div
               key={index}
-              // Card style updated for a cleaner, modern look
+ 
               className="bg-gray-50 rounded-xl border border-gray-100 p-8 text-left transition transform hover:shadow-lg hover:border-indigo-200"
             >
-              {/* Icon Placeholder */}
+     
               <div className="text-4xl mb-4">
                 {feature.icon}
               </div>
