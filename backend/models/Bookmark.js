@@ -1,11 +1,18 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+ 
 
-const bookmarkSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  url: { type: String, required: true },
-  description: String,
-  tags: [String],
-  createdAt: { type: Date, default: Date.now }
+const BookmarkSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    url: { type: String, required: true },
+    description: String,
+    tags: [String],
+    
+    // *** NEW FIELD FOR AUTHENTICATION ***
+    userId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        required: true 
+    }
+    // *************************************
 });
 
-export default mongoose.model("Bookmark", bookmarkSchema);
+export default mongoose.model('Bookmark', BookmarkSchema);

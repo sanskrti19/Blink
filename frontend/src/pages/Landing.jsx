@@ -6,7 +6,7 @@ import Hero from '../components/Hero';
 import Features from '../components/Features'; 
 import Footer from '../components/Footer';
 
-const LandingPage = () => {
+const Landing = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Header />
@@ -23,4 +23,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default Landing;

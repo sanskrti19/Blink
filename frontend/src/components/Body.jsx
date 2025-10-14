@@ -1,6 +1,6 @@
  
 import LandingPage from './pages/LandingPage'  
-import Login from './pages/Login'           
+         
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from './Home'
 
@@ -11,12 +11,7 @@ const Body = () => {
             path: "/",
             element: <LandingPage/>, 
         },
-        {
-             
-            path: "/login",
-            element: <Login/>,
-
-        },
+       
         {
             
             path: "/home", 
