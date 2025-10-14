@@ -1,13 +1,14 @@
-// src/Home.jsx
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth'; 
  import { auth } from '../utils/firebase';
+ 
 
 const Home = () => {
   const navigate = useNavigate();
 
-  // Handle Logout
+ 
   const handleLogout = async () => {
     try {
       await signOut(auth);

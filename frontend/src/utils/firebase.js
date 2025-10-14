@@ -1,14 +1,14 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; 
- const firebaseConfig = {
+import { getAuth } from "firebase/auth";
 
-  authDomain: "blink-9b158.firebaseapp.com",
-  projectId: "blink-9b158",
-  storageBucket: "blink-9b158.firebasestorage.app",
-  messagingSenderId: "1015973393721",
-  appId: "1:1015973393721:web:48f0a15f52f90161a3a4e8",
-  measurementId: "G-S7ZKD7606E"
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
