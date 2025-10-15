@@ -10,10 +10,4 @@ export const BGIMG = "https://assets.nflxext.com/ffe/siteui/vlv3/0b0dad79-ad4d-4
 
  
 
-// export const SUPPORTED_LANGUAGE=[
-//   {identifier:"en", name:"  English"},
-//  {identifier:"hindi", name:"Hindi"},
-//  {identifier:"spanish", name:"Spanish"}
-// ]
-
  

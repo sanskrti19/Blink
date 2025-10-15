@@ -48,14 +48,12 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Successful signup/login
+         
         const token = data.token;
         localStorage.setItem('authToken', token);
-        
-        // Success message for user
+         
         setErrorMessage("Success! Redirecting to home...");
-        
-        // Navigate after a short delay for user to see the success message
+         
         setTimeout(() => navigate("/home"), 1000); 
         
       } else {

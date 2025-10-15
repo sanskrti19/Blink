@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-// Assuming API URL is in your environment variables
+ 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 function Login() {
@@ -15,7 +14,7 @@ function Login() {
         setError('');
 
         try {
-            // Send POST request to login API
+          
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -25,18 +24,18 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                // Store the token in local storage
+                
                 localStorage.setItem('authToken', data.token); 
                 
-                // Redirect to home page
+                 
                 navigate('/home'); 
             } else {
-                // Display error message if authentication fails
+                
                 setError(data.msg || 'Login failed. Please check your credentials.');
             }
 
         } catch (err) {
-            // Handle any unexpected errors
+         
             setError('An error occurred during login. Please try again.');
         }
     };
