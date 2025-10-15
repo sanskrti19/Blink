@@ -1,85 +1,134 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
- 
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+// FIX: Hardcode API Base URL to bypass stubborn VITE_API_BASE_URL issue, 
+// ensuring the component connects correctly.
+const API_BASE_URL = "http://localhost:5000/api"; 
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError('');
+const Login = () => {
+  // Using user's preferred state approach
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-        try {
+  const handleLogin = async (e) => {
+    e.preventDefault(); 
+    setErrorMessage("");
+    setIsLoading(true);
+
+    if (!email || !password) {
+      setErrorMessage("Please enter both email and password.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // 1. Send Request to Express Backend /api/auth/login
+      const loginEndpoint = `${API_BASE_URL}/auth/login`;
+      
+      console.log("Attempting POST to:", loginEndpoint); 
+
+      const response = await fetch(loginEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }), 
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Successful login: Store the token and navigate
+        const token = data.token;
+        localStorage.setItem('authToken', token);
+        
+        setErrorMessage("Success! Logging you in...");
+        
+        // Navigate to the protected home page after a short delay
+        setTimeout(() => navigate("/home"), 500); 
+        
+      } else {
+        // Handle API errors (e.g., Invalid Credentials, 401 Unauthorized)
+        setErrorMessage(data.msg || "Login failed. Check your credentials.");
+      }
+
+    } catch (error) {
+      // Catch network errors
+      console.error("Login network error:", error);
+      setErrorMessage("Network error: Could not connect to the server.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl">
+        <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
+          Welcome Back 👋
+        </h1>
+        
+        <form onSubmit={handleLogin}>
           
-            const response = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
-            
-            const data = await response.json();
+          <input
+            type="email"
+            placeholder="Email Address"
+            value={email} // Controlled component
+            onChange={(e) => setEmail(e.target.value)}
+            className="p-3 w-full mb-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            disabled={isLoading}
+            required
+          />
 
-            if (response.ok) {
-                
-                localStorage.setItem('authToken', data.token); 
-                
-                 
-                navigate('/home'); 
-            } else {
-                
-                setError(data.msg || 'Login failed. Please check your credentials.');
-            }
+          <input
+            type="password"
+            placeholder="Password"
+            value={password} // Controlled component
+            onChange={(e) => setPassword(e.target.value)}
+            className="p-3 w-full mb-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            disabled={isLoading}
+            required
+          />
 
-        } catch (err) {
-         
-            setError('An error occurred during login. Please try again.');
-        }
-    };
+          {errorMessage && (
+            <p className={`text-sm font-medium mb-3 ${errorMessage.startsWith('Success') ? 'text-green-600' : 'text-red-600'}`}>
+                {errorMessage}
+            </p>
+          )}
 
-    return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-                <h2 className="text-3xl font-semibold text-center mb-6 text-gray-700">Log In</h2>
-                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-                
-                <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                        <input 
-                            type="email" 
-                            placeholder="Email"
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                            required 
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                    </div>
-                    <div>
-                        <input 
-                            type="password" 
-                            placeholder="Password"
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                            required 
-                            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
-                        className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
-                    >
-                        Log In
-                    </button>
-                </form>
-                <div className="text-center mt-4">
-                    <a href="/signup" className="text-indigo-600 hover:underline">Don't have an account? Sign up</a>
-                </div>
-            </div>
-        </div>
-    );
-}
+          <button
+            type="submit" 
+            className={`w-full py-3 text-white rounded-lg font-semibold transition-all ${
+              isLoading 
+                ? 'bg-indigo-400 cursor-not-allowed flex justify-center items-center' 
+                : 'bg-indigo-600 hover:bg-indigo-700'
+            }`}
+            disabled={isLoading}
+          >
+            {isLoading 
+              ? (
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )
+              : "Log In"}
+          </button>
+        </form>
+
+        <p
+          onClick={() => navigate('/signup')}
+          className="text-sm text-center mt-4 text-gray-600 cursor-pointer hover:text-indigo-600 transition-all"
+        >
+          Don't have an account? Sign up
+        </p>
+      </div>
+    </div>
+  );
+};
 
 export default Login;
