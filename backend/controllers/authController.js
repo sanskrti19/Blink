@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-dotenv.config(); // Ensure env variables are loaded here too
+dotenv.config();  
 
 // --- JWT HELPER FUNCTION ---
 const createJWT = (user) => {
@@ -17,12 +17,19 @@ const createJWT = (user) => {
 };
 // ----------------------------
 
+// controllers/authController.js
+
+// ... (existing imports and createJWT function) ...
+
 // 1. REGISTER LOGIC
 export const register = async (req, res) => {
-    const { email, password } = req.body;
+    // 🚨 FIX: Destructure 'name' from the request body 
+    const { name, email, password } = req.body; 
 
-    if (!email || !password) {
-        return res.status(400).json({ msg: 'Please provide email and password' });
+    // Check for all required fields
+    if (!name || !email || !password) {
+        // Updated message to include name
+        return res.status(400).json({ msg: 'Please provide name, email, and password' }); 
     }
 
     try {
@@ -33,21 +40,27 @@ export const register = async (req, res) => {
         }
 
         // HASH THE PASSWORD
-        const salt = await bcrypt.genSalt(10); // Generates a salt for security
+        const salt = await bcrypt.genSalt(10); 
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Create the new user with the HASHED password
-        const user = await User.create({ email, password: hashedPassword });
+        // Create the new user with the HASHED password, now including 'name'
+        const user = await User.create({ name, email, password: hashedPassword }); 
+        //                             ^^^^ Include 'name' here
 
         // Generate token and send back
         const token = createJWT(user);
-        res.status(201).json({ user: { email: user.email }, token });
+        // Added 'name' to the response body for consistency
+        res.status(201).json({ user: { name: user.name, email: user.email }, token }); 
 
     } catch (error) {
         // Handle validation errors (e.g., email format)
+        // I recommend adding console.error here to see the stack trace next time!
+        console.error("Registration failed:", error); 
         res.status(500).json({ msg: 'Registration failed', error: error.message });
     }
 };
+
+// ... (existing login function) ...
 
 // 2. LOGIN LOGIC
 export const login = async (req, res) => {

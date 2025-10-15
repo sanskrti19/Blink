@@ -2,6 +2,12 @@
 import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
+  name: { // <--- NEWLY ADDED NAME FIELD
+    type: String,
+    required: [true, 'Please provide name'],
+    minlength: 3,
+    trim: true, // Removes whitespace from both ends of a string
+  },
   email: {
     type: String,
     required: [true, 'Please provide email'],

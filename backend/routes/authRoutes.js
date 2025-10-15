@@ -1,7 +1,11 @@
-// routes/authRoutes.js
+
 import express from "express";
 import { register, login } from '../controllers/authController.js';
 import authenticateToken from "../middleware/authMiddleware.js";
+ 
+import mongoose from "mongoose";
+import cors from "cors"; // <--- THIS LINE IS CRUCIAL
+import dotenv from "dotenv";
 
 const router = express.Router();
 
