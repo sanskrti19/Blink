@@ -1,17 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// FIX: Hardcode API Base URL to bypass stubborn VITE_API_BASE_URL issue, 
-// ensuring the component connects correctly.
 const API_BASE_URL = "http://localhost:5000/api"; 
 
 const Login = () => {
-  // Using user's preferred state approach
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+ const [email, setEmail] = useState(''); 
+ const [password, setPassword] = useState(''); 
+ const [errorMessage, setErrorMessage] = useState("");
+ const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -26,11 +21,8 @@ const Login = () => {
     }
 
     try {
-      // 1. Send Request to Express Backend /api/auth/login
       const loginEndpoint = `${API_BASE_URL}/auth/login`;
       
-      console.log("Attempting POST to:", loginEndpoint); 
-
       const response = await fetch(loginEndpoint, {
         method: "POST",
         headers: {
@@ -39,27 +31,28 @@ const Login = () => {
         body: JSON.stringify({ email, password }), 
       });
 
-      const data = await response.json();
+      // Attempt to parse JSON. If the server crashes and sends HTML, the catch block handles the SyntaxError.
+      const data = await response.json(); 
 
       if (response.ok) {
-        // Successful login: Store the token and navigate
         const token = data.token;
-        localStorage.setItem('authToken', token);
+        // 🚨 CRITICAL: Use the consistent key 'token'
+        localStorage.setItem('token', token); 
         
         setErrorMessage("Success! Logging you in...");
-        
-        // Navigate to the protected home page after a short delay
+          
         setTimeout(() => navigate("/home"), 500); 
         
       } else {
-        // Handle API errors (e.g., Invalid Credentials, 401 Unauthorized)
-        setErrorMessage(data.msg || "Login failed. Check your credentials.");
+        // Use data.message (from controller) if available, otherwise generic failure
+        setErrorMessage(data.message || "Login failed. Invalid credentials or server response.");
       }
 
     } catch (error) {
-      // Catch network errors
+        
       console.error("Login network error:", error);
-      setErrorMessage("Network error: Could not connect to the server.");
+      // Informative error message for network issues or JSON parsing failures (HTML response)
+      setErrorMessage("Network error: Could not connect to the server or received invalid data. Please check the backend console for crashes.");
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +70,7 @@ const Login = () => {
           <input
             type="email"
             placeholder="Email Address"
-            value={email} // Controlled component
+            value={email} 
             onChange={(e) => setEmail(e.target.value)}
             className="p-3 w-full mb-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
             disabled={isLoading}
@@ -87,7 +80,7 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            value={password} // Controlled component
+            value={password} 
             onChange={(e) => setPassword(e.target.value)}
             className="p-3 w-full mb-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
             disabled={isLoading}

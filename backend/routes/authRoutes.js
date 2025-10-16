@@ -1,20 +1,9 @@
-import express from "express";
-import { 
-    getUsersBookmarks, 
-    saveBookmarks,
-    addSingleBookmark, 
-    deleteSingleBookmark 
-} from "../controllers/bookmarkController.js"; 
- 
-import authenticateToken from "../middleware/authMiddleware.js"; 
+import express from 'express';
+import { loginUser, registerUser } from '../controllers/authController.js';
 
 const router = express.Router();
- 
-router.get("/", authenticateToken, getUsersBookmarks);
- 
-router.post("/", authenticateToken, saveBookmarks);
 
- 
-router.delete("/:id", authenticateToken, deleteSingleBookmark);
+router.post('/login', loginUser); // Maps POST /api/auth/login to loginUser
+router.post('/register', registerUser); // Maps POST /api/auth/register to registerUser
 
 export default router;

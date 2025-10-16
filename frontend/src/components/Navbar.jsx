@@ -27,7 +27,7 @@ export default function Navbar() {
         </li>
         <li>
           <NavLink 
-            to="/dashboard" 
+            to="/home" 
             className={({ isActive }) => 
               `${baseClasses} ${isActive ? activeClasses : ""}`
             }
