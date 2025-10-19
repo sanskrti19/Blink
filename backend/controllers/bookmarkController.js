@@ -25,7 +25,6 @@ const parseHtmlBookmarks = (htmlContent, userId) => {
         return bookmarks;
     }
 
-    // This logic handles nested HTML elements correctly to identify folders and links
     const processNodes = (nodes) => {
         nodes.forEach(node => {
             if (node.tagName === 'H3') {
@@ -45,7 +44,7 @@ const parseHtmlBookmarks = (htmlContent, userId) => {
                         bookmarks.push({
                             title,
                             url,
-                            // Ensure key is 'folder' for consistency
+                          
                             folder: currentFolder, 
                             tags: tags,
                             user: userId, 
@@ -54,7 +53,6 @@ const parseHtmlBookmarks = (htmlContent, userId) => {
                 }
             }
 
-            // Recursively check DL elements for nested folders/links
             if (node.tagName === 'DL') {
                 processNodes(node.childNodes);
             }
@@ -86,8 +84,6 @@ export const uploadBookmarks = async (req, res) => {
         
         console.log(`Parsed ${structuredBookmarks.length} valid bookmarks for insertion.`);
 
-        // ordered: false allows some bookmarks to be inserted even if others fail validation (e.g. duplicates)
-        // Set up for better error handling in case of validation failure
         const insertionResult = await Bookmark.insertMany(structuredBookmarks, { ordered: false }); 
 
         res.status(201).json({ 
@@ -96,10 +92,10 @@ export const uploadBookmarks = async (req, res) => {
         });
         
     } catch (error) {
-        // 🚨 ENHANCEMENT: Log detailed error info for Mongoose Validation errors
+  
         if (error.name === 'ValidationError') {
             console.error("Mongoose Validation Error:", error.message);
-            // In case of ordered: false, it often throws a BulkWriteError if even one fails
+           
         } else if (error.name === 'MongoBulkWriteError' && error.writeErrors) {
             console.error(`Bulk Write Error: ${error.message}. First error details:`, error.writeErrors[0].errmsg);
             return res.status(400).json({ 
@@ -120,10 +116,8 @@ export const uploadBookmarks = async (req, res) => {
 
 export const getBookmarks = async (req, res) => {
     try {
-        // Assuming your middleware populates req.user.userId
+      
         const userId = req.user.userId; 
-        
-        // Ensure this query key 'user' matches the key used during insertion and in the Mongoose schema
         const bookmarks = await Bookmark.find({ user: userId }).sort({ folder: 1, title: 1 }); 
         
         res.json(bookmarks);

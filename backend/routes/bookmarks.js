@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/', protect, getBookmarks);
 
 router.post('/upload', protect, upload.single('bookmarkFile'), uploadBookmarks); 
-                             // The upload route uses the correct 'user' key in the controller.
+ 
 
 
 router.post("/", protect, async (req, res) => {
@@ -21,8 +21,7 @@ router.post("/", protect, async (req, res) => {
         description, 
         tags, 
         category,  
-        // 🚨 CRITICAL FIX: Ensure the key matches your Mongoose schema (usually 'user')
-        // and the value comes from the protected route payload (assuming it's req.user.userId)
+    
         user: req.user.userId 
     });
 
@@ -41,7 +40,7 @@ router.put("/:id", protect, async (req, res) => {
         const bookmark = await Bookmark.findOneAndUpdate(
             { 
                 _id: req.params.id, 
-                // 🚨 CRITICAL FIX: Use the correct key for querying (user)
+                
                 user: req.user.userId 
             },
             { $set: updates }, 
@@ -61,7 +60,7 @@ router.delete("/:id", protect, async (req, res) => {
     try {
         const bookmark = await Bookmark.findOneAndDelete({ 
             _id: req.params.id, 
-            // 🚨 CRITICAL FIX: Use the correct key for querying (user)
+          
             user: req.user.userId 
         });
 

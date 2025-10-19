@@ -1,18 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
- 
-const API_BASE_URL = 'http://localhost:5000/api'; 
+ 
+import { LogOut, Plus, Loader } from 'lucide-react'; 
+ 
 
+import BookmarkFormModal from './FormModal';  
+import BookmarkCard from './BookmarkCard';  
+
+const API_BASE_URL = 'http://localhost:5000/api'; 
+ 
+ 
 function Dashboard() {
     const [bookmarks, setBookmarks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
+    
+  
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentBookmark, setCurrentBookmark] = useState(null);  
+
     const navigate = useNavigate();
-    // console.log("Current Bookmarks State:", bookmarks); // Commented out to reduce console noise
- 
+
     const fetchBookmarks = async () => {
         const token = localStorage.getItem('token'); 
         if (!token) {
@@ -22,13 +33,7 @@ function Dashboard() {
         }
         
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`, 
-                },
-            };
-            
-           
+            const config = { headers: { Authorization: `Bearer ${token}` } };
             const { data } = await axios.get(`${API_BASE_URL}/bookmarks`, config); 
             
             setBookmarks(data);
@@ -37,8 +42,8 @@ function Dashboard() {
             console.error('Error fetching bookmarks:', error);
             
             if (error.response && error.response.status === 401) {
-                 localStorage.removeItem('token');
-                 navigate('/login');
+                localStorage.removeItem('token');
+                navigate('/login');
             }
             setLoading(false);
         }
@@ -46,8 +51,59 @@ function Dashboard() {
 
     useEffect(() => {
         fetchBookmarks();
-    }, []);  
-     
+    }, []); 
+
+   
+
+    const handleOpenCreateModal = () => {
+        setCurrentBookmark(null);
+        setIsModalOpen(true);
+    };
+
+    const handleOpenEditModal = (bookmark) => {
+        setCurrentBookmark(bookmark);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setCurrentBookmark(null);
+    };
+    
+    const handleSaveOrUpdate = (savedBookmark) => {
+       
+        if (currentBookmark) {
+          
+            setBookmarks(prev => prev.map(bm => bm._id === savedBookmark._id ? savedBookmark : bm));
+        } else {
+             
+            setBookmarks(prev => [savedBookmark, ...prev]);
+        }
+        handleCloseModal();
+    };
+
+    const handleDelete = async (id) => {
+         
+        if (!window.confirm('Are you sure you want to delete this bookmark?')) return;
+        
+        const token = localStorage.getItem('token');
+        try {
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            await axios.delete(`${API_BASE_URL}/bookmarks/${id}`, config);
+        
+            setBookmarks(prev => prev.filter(bm => bm._id !== id));
+           
+            setUploadMessage({ type: 'success', text: 'Bookmark deleted successfully.' });
+            setTimeout(() => setUploadMessage({ type: '', text: '' }), 3000);
+            
+        } catch (error) {
+            console.error('Delete Error:', error.response?.data?.message || error.message);
+            setUploadMessage({ type: 'error', text: `Failed to delete: ${error.response?.data?.message || 'Check console.'}` });
+            setTimeout(() => setUploadMessage({ type: '', text: '' }), 3000);
+        }
+    };
+
+    
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -58,6 +114,7 @@ function Dashboard() {
             setFile(null);
             setUploadMessage({ type: 'error', text: 'Please select a valid HTML bookmark file (.html extension).' });
         }
+        setTimeout(() => setUploadMessage({ type: '', text: '' }), 3000);
     };
 
     const handleUploadSubmit = async (e) => {
@@ -68,7 +125,7 @@ function Dashboard() {
         }
 
         setIsUploading(true);
-        setUploadMessage({ type: 'info', text: 'Uploading and processing file... This may take a moment for large files.' });
+        setUploadMessage({ type: 'info', text: 'Uploading and processing file... This may take a moment.' });
 
         const token = localStorage.getItem('token');
         if (!token) {
@@ -81,27 +138,19 @@ function Dashboard() {
         formData.append('bookmarkFile', file);  
 
         try {
-            const config = {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`, 
-                },
-            };
-             
+            const config = { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } };
             const response = await axios.post(`${API_BASE_URL}/bookmarks/upload`, formData, config);
-             
+            
             setFile(null); 
             e.target.reset(); 
 
-            // Success logic is correctly placed here:
             setUploadMessage({ 
                 type: 'success', 
                 text: response.data.message || 'Bookmarks uploaded successfully! Refreshing list...' 
             });
             
-             
             setTimeout(() => {
-                fetchBookmarks(); // CRITICAL: Re-fetch data to update the UI
+                fetchBookmarks(); 
                 setUploadMessage({ type: '', text: '' });  
             }, 1500); 
 
@@ -109,6 +158,7 @@ function Dashboard() {
             console.error('Upload error:', error);
             const msg = error.response?.data?.message || 'Upload failed. Check server console.';
             setUploadMessage({ type: 'error', text: msg });
+            setTimeout(() => setUploadMessage({ type: '', text: '' }), 5000);
         } finally {
             setIsUploading(false);
         }
@@ -118,14 +168,12 @@ function Dashboard() {
         localStorage.removeItem('token');
         navigate('/login');
     };
+ 
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="text-xl font-medium text-indigo-600 animate-pulse">
-                <svg className="animate-spin h-6 w-6 mr-3 inline text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+            <Loader className="animate-spin h-8 w-8 text-indigo-600 mr-3" />
+            <div className="text-xl font-medium text-indigo-600">
                 Loading your links...
             </div>
         </div>
@@ -139,123 +187,118 @@ function Dashboard() {
             default: return 'text-gray-600 bg-gray-50 border-gray-200';
         }
     };
-
+ 
 
     return (
-        <div className="min-h-screen bg-gray-100 p-4 sm:p-8 font-inter">
-            {/* Header */}
-            <header className="flex justify-between items-center mb-10 pb-4">
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-inter">
+             
+            <header className="max-w-7xl mx-auto flex justify-between items-center mb-10 pb-4 border-b border-gray-200">
                 <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
-                    Your Blink Bookmarks
+                    Blink Bookmarks
                 </h1>
-                <button 
-                    onClick={handleLogout}
-                    className="py-2 px-6 bg-red-500 text-white font-semibold rounded-xl shadow-md hover:bg-red-600 transition duration-150 transform hover:scale-105"
-                >
-                    Logout
-                </button>
+                <div className="flex items-center space-x-4">
+                    <button 
+                        onClick={handleOpenCreateModal}
+                        className="py-2 px-4 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:bg-indigo-700 transition duration-150 transform hover:scale-105 flex items-center"
+                    >
+                        <Plus className="w-5 h-5 mr-2" />
+                        Add Link
+                    </button>
+                    <button 
+                        onClick={handleLogout}
+                        className="py-2 px-4 bg-red-500 text-white font-semibold rounded-xl shadow-md hover:bg-red-600 transition duration-150 transform hover:scale-105 flex items-center"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
+                </div>
             </header>
             
-            {/* --- File Upload Card --- */}
-            <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-xl border border-indigo-100 mb-12">
-                <div className="flex items-center mb-4">
-                    <svg className="w-6 h-6 text-indigo-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <h2 className="text-2xl font-bold text-indigo-700">Import Bookmarks</h2>
-                </div>
-                <p className="text-gray-600 mb-6">
-                    Upload your browser's exported **HTML bookmark file** to sync your links instantly.
-                </p>
-
-                <form onSubmit={handleUploadSubmit} className="space-y-4">
-                    <label className="block">
-                        <span className="sr-only">Choose bookmark file</span>
-                        <input 
-                            type="file" 
-                            accept=".html"
-                            onChange={handleFileChange}
-                            disabled={isUploading}
-                            className="block w-full text-sm text-gray-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-indigo-100 file:text-indigo-700
-                                hover:file:bg-indigo-200 cursor-pointer transition duration-150"
-                        />
-                    </label>
-
-                    {/* Dynamic Message Box */}
-                    {uploadMessage.text && (
-                        <div className={`p-3 rounded-lg border text-sm font-medium ${getMessageStyle()}`}>
-                            {uploadMessage.text}
-                        </div>
-                    )}
-                    
-
-                    <button
-                        type="submit" 
-                        disabled={!file || isUploading}
-                        className={`w-full py-3 px-6 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center transform hover:scale-[1.01] ${
-                            !file || isUploading 
-                                ? 'bg-gray-400 text-gray-700 cursor-not-allowed' 
-                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                        }`}
-                    >
-                        {isUploading ? (
-                            <svg className="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        ) : 'Start Upload and Save'}
-                    </button>
-                </form>
-            </div>
-
-
-            {/* --- Bookmarks List Section --- */}
-            <h2 className="text-2xl font-bold text-gray-800 mb-5 max-w-4xl mx-auto">
-                All Saved Links ({bookmarks.length})
-            </h2>
-            
-            {bookmarks.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                    {bookmarks.map(bm => (
-                        <div key={bm._id} className="bg-white p-5 rounded-xl shadow-md hover:shadow-xl transition duration-300 transform hover:translate-y-[-2px] border border-gray-100">
-                            <a 
-                                href={bm.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                className="text-lg font-semibold text-indigo-600 hover:text-indigo-700 transition block mb-1 truncate"
-                                title={bm.title}
-                            >
-                                {bm.title}
-                            </a>
-                            <p className="text-sm text-gray-500 truncate mb-3">{bm.url}</p>
-                            
-                            <div className="flex flex-wrap gap-2">
-                                <span className="bg-indigo-100 text-indigo-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                    {bm.folder || 'Root'}
-                                </span>
-                                {bm.tags && Array.isArray(bm.tags) && bm.tags.map((tag, index) => (
-                                    <span key={index} className="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                                        #{tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                /* Enhanced Empty State */
-                <div className="max-w-4xl mx-auto bg-white p-12 rounded-2xl shadow-inner border border-dashed border-gray-300 text-center">
-                    <svg className="w-12 h-12 text-indigo-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg>
-                    <p className="text-xl font-semibold text-gray-700 mb-2">
-                        No Bookmarks Found
+            <main className="max-w-7xl mx-auto space-y-10">
+                 
+                {uploadMessage.text && (
+                    <div className={`p-4 rounded-xl border text-sm font-medium ${getMessageStyle()}`}>
+                        {uploadMessage.text}
+                    </div>
+                )}
+                 
+                <details className="bg-white p-6 rounded-2xl shadow-xl border border-indigo-100 transition duration-300">
+                    <summary className="flex items-center cursor-pointer font-bold text-indigo-700 text-lg">
+                        <svg className="w-6 h-6 text-indigo-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Import Bookmarks from HTML
+                    </summary>
+                    <p className="text-gray-600 mt-4 mb-6">
+                        Upload your browser's exported HTML bookmark file to bulk sync your links.
                     </p>
-                    <p className="text-gray-500">
-                        You're logged in! Upload your browser's HTML bookmark file above to get started.
-                    </p>
-                </div>
-            )}
+
+                    <form onSubmit={handleUploadSubmit} className="space-y-4">
+                        <label className="block">
+                            <span className="sr-only">Choose bookmark file</span>
+                            <input 
+                                type="file" 
+                                accept=".html"
+                                onChange={handleFileChange}
+                                disabled={isUploading}
+                                className="block w-full text-sm text-gray-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-full file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-indigo-100 file:text-indigo-700
+                                    hover:file:bg-indigo-200 cursor-pointer transition duration-150"
+                            />
+                        </label>
+                        
+                        <button
+                            type="submit" 
+                            disabled={!file || isUploading}
+                            className={`w-full py-3 px-6 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center transform hover:scale-[1.01] ${
+                                !file || isUploading 
+                                    ? 'bg-gray-400 text-gray-700 cursor-not-allowed' 
+                                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                            }`}
+                        >
+                            {isUploading ? (
+                                <Loader className="animate-spin h-5 w-5 mr-3 text-white" />
+                            ) : 'Start Upload and Save'}
+                        </button>
+                    </form>
+                </details>
+ 
+                <h2 className="text-2xl font-bold text-gray-800">
+                    All Saved Links ({bookmarks.length})
+                </h2>
+                
+                {bookmarks.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {bookmarks.map(bm => (
+                            <BookmarkCard 
+                                key={bm._id} 
+                                bm={bm} 
+                                onEdit={handleOpenEditModal} 
+                                onDelete={handleDelete}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                
+                    <div className="bg-white p-12 rounded-2xl shadow-inner border border-dashed border-gray-300 text-center">
+                        <svg className="w-12 h-12 text-indigo-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path></svg>
+                        <p className="text-xl font-semibold text-gray-700 mb-2">
+                            No Bookmarks Found
+                        </p>
+                        <p className="text-gray-500">
+                            Start by clicking "Add Link" above or expand the import section.
+                        </p>
+                    </div>
+                )}
+            </main>
+ 
+            <BookmarkFormModal 
+                isOpen={isModalOpen} 
+                onClose={handleCloseModal} 
+                bookmarkToEdit={currentBookmark}
+                onSave={handleSaveOrUpdate}
+                setGlobalMessage={setUploadMessage}  
+            />
 
         </div>
     );

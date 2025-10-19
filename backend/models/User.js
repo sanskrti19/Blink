@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs'; // 🚨 CRITICAL FIX: Add this import here!
+import bcrypt from 'bcryptjs'; 
 
 const UserSchema = new mongoose.Schema({
     name: {  
@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 },{timestamps:true});
 UserSchema.pre('save',async function (next){
     if(!this.isModified('password')){
-        // The error occurs right here because 'bcrypt' is undefined
+  
         return next();
     }
     const salt = await bcrypt.genSalt(10);
