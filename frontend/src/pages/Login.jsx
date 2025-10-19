@@ -48,40 +48,38 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-white animate-gradient-x bg-[length:300%_300%]">
-      {/* Left Illustration Section */}
-      <div className="hidden md:flex w-1/2 items-center justify-center rounded-2xl">
+       
+      <div className="hidden md:flex w-1/2 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-200">
         <img
           src={LOGIN_ILLUSTATION}
           alt="B-link Illustration"
-          className="w-3/4 max-w-md drop-shadow-2xl rounded-b-full animate-float rounded-t-full"
+          className="w-3/4 max-w-md drop-shadow-2xl rounded-full animate-float"
         />
       </div>
-
-      {/* Right Form Section */}
-      <div className="w-full md:w-1/2 flex items-center justify-center bg-gradient-to-br from-gray-50 to-green-50">
-        <div className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-green-100">
-          <h1 className="text-3xl font-extrabold text-center text-green-700 mb-2">
-            Hey there!
+ 
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100">
+        <div className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-purple-200">
+          <h1 className="text-3xl font-extrabold text-center text-purple-700 mb-2">
+            Welcome back
           </h1>
-          <h2 className="text-2xl font-bold text-center text-green-600 mb-1 relative">
-            Welcome back to{" "}
-            <span className="relative text-emerald-600">
+          <h2 className="text-2xl font-bold text-center text-indigo-600 mb-1 relative">
+            Login to{" "}
+            <span className="relative text-purple-600">
               B-link
-              <span className="absolute inset-0 blur-sm bg-emerald-400 opacity-30 rounded-full"></span>
+              <span className="absolute inset-0 blur-sm bg-purple-400 opacity-30 rounded-full"></span>
             </span>
           </h2>
           <p className="text-center text-gray-500 mb-6 italic">
             Connect. Create. Collaborate.
           </p>
-
-          {/* Login Form */}
+ 
           <form onSubmit={handleLogin}>
             <input
               type="email"
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="p-3 w-full mb-3 bg-green-50 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition-all"
+              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
               disabled={isLoading}
               required
             />
@@ -91,7 +89,7 @@ const Login = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="p-3 w-full mb-3 bg-green-50 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition-all"
+              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
               disabled={isLoading}
               required
             />
@@ -112,8 +110,8 @@ const Login = () => {
               type="submit"
               className={`w-full py-3 rounded-lg font-semibold text-white transition-transform ${
                 isLoading
-                  ? "bg-green-400 cursor-not-allowed flex justify-center items-center"
-                  : "bg-gradient-to-r from-emerald-500 to-green-600 hover:scale-[1.03] shadow-lg hover:shadow-emerald-200"
+                  ? "bg-purple-400 cursor-not-allowed flex justify-center items-center"
+                  : "bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-[1.03] shadow-lg hover:shadow-indigo-200"
               }`}
               disabled={isLoading}
             >
@@ -149,10 +147,10 @@ const Login = () => {
 
           <p
             onClick={() => navigate("/signup")}
-            className="text-sm text-center mt-4 text-gray-600 cursor-pointer hover:text-green-600 transition-all"
+            className="text-sm text-center mt-4 text-gray-600 cursor-pointer hover:text-purple-600 transition-all"
           >
             Don’t have an account?{" "}
-            <span className="font-semibold text-green-700 hover:underline">
+            <span className="font-semibold text-purple-700 hover:underline">
               Join the fun
             </span>
           </p>

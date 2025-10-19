@@ -53,20 +53,25 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-white">
-     
-      <div className="hidden md:flex w-1/2 items-center justify-center rounded-2xl">
+    <div className="flex flex-col md:flex-row min-h-screen bg-white animate-gradient-x bg-[length:300%_300%]">
+  
+      <div className="hidden md:flex w-1/2 items-center justify-center bg-gradient-to-br from-purple-100 to-indigo-200 rounded-2xl">
         <img
           src={LOGIN_ILLUSTATION}
           alt="B-link Illustration"
-          className="w-3/4 max-w-md drop-shadow-2xl rounded-b-full animate-float rounded-t-full"
+          className="w-3/4 max-w-md drop-shadow-2xl rounded-full animate-float"
         />
       </div>
 
-      <div className="w-full md:w-1/2 flex items-center justify-center bg-gradient-to-br from-gray-50 to-green-50">
-        <div className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-green-100">
-          <h1 className="text-3xl font-extrabold text-center text-green-700 mb-6">
-            Create your <span className="text-green-600">B-link</span> Account 
+      <div className="w-full md:w-1/2 flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100">
+        <div className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-purple-200">
+          <h1 className="text-3xl font-extrabold text-center text-purple-700 mb-6">
+            Create your{" "}
+            <span className="text-indigo-600 relative">
+              B-link
+              <span className="absolute inset-0 blur-sm bg-purple-400 opacity-30 rounded-full"></span>
+            </span>{" "}
+            Account 
           </h1>
 
           <form onSubmit={handleSignup}>
@@ -74,7 +79,7 @@ const Signup = () => {
               ref={nameRef}
               type="text"
               placeholder="Full Name"
-              className="p-3 w-full mb-3 bg-green-50 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition-all"
+              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
               disabled={isLoading}
               required
             />
@@ -83,7 +88,7 @@ const Signup = () => {
               ref={emailRef}
               type="email"
               placeholder="Email Address"
-              className="p-3 w-full mb-3 bg-green-50 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition-all"
+              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
               disabled={isLoading}
               required
             />
@@ -92,7 +97,7 @@ const Signup = () => {
               ref={passwordRef}
               type="password"
               placeholder="Password"
-              className="p-3 w-full mb-3 bg-green-50 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-400 outline-none transition-all"
+              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
               disabled={isLoading}
               required
             />
@@ -111,10 +116,10 @@ const Signup = () => {
 
             <button
               type="submit"
-              className={`w-full py-3 rounded-lg font-semibold text-white transition-all ${
+              className={`w-full py-3 rounded-lg font-semibold text-white transition-transform ${
                 isLoading
-                  ? "bg-green-400 cursor-not-allowed flex justify-center items-center"
-                  : "bg-green-600 hover:bg-green-700 shadow-md"
+                  ? "bg-purple-400 cursor-not-allowed flex justify-center items-center"
+                  : "bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-[1.03] shadow-lg hover:shadow-indigo-200"
               }`}
               disabled={isLoading}
             >
@@ -150,10 +155,10 @@ const Signup = () => {
 
           <p
             onClick={() => navigate("/login")}
-            className="text-sm text-center mt-4 text-gray-600 cursor-pointer hover:text-green-600 transition-all"
+            className="text-sm text-center mt-4 text-gray-600 cursor-pointer hover:text-purple-600 transition-all"
           >
             Already have an account?{" "}
-            <span className="font-semibold text-green-700 hover:underline">
+            <span className="font-semibold text-purple-700 hover:underline">
               Log in
             </span>
           </p>
