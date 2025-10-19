@@ -1,18 +1,18 @@
 import express from "express";
- 
+
 import { getBookmarks, uploadBookmarks, upload } from '../controllers/bookmarkController.js'; 
 import Bookmark from "../models/Bookmark.js";
 import protect from '../middleware/authMiddleware.js';
- 
+
 const router = express.Router(); 
 router.get('/', protect, getBookmarks);
- 
+
 router.post('/upload', protect, upload.single('bookmarkFile'), uploadBookmarks); 
                              // The upload route uses the correct 'user' key in the controller.
- 
- 
+
+
 router.post("/", protect, async (req, res) => {
- 
+
     const { title, url, description, tags, category } = req.body;
     
     const bookmark = new Bookmark({ 
@@ -21,7 +21,9 @@ router.post("/", protect, async (req, res) => {
         description, 
         tags, 
         category,  
-        user: req.user.userId // <-- 🚨 CRITICAL FIX 2: Change userId to user
+        // 🚨 CRITICAL FIX: Ensure the key matches your Mongoose schema (usually 'user')
+        // and the value comes from the protected route payload (assuming it's req.user.userId)
+        user: req.user.userId 
     });
 
     try {
@@ -31,7 +33,7 @@ router.post("/", protect, async (req, res) => {
         res.status(400).json({ message: "Failed to create bookmark.", error: err.message });
     }
 });
- 
+
 router.put("/:id", protect, async (req, res) => {
     const updates = req.body;
     
@@ -39,7 +41,8 @@ router.put("/:id", protect, async (req, res) => {
         const bookmark = await Bookmark.findOneAndUpdate(
             { 
                 _id: req.params.id, 
-                user: req.user.userId // <-- 🚨 CRITICAL FIX 3: Change userId to user
+                // 🚨 CRITICAL FIX: Use the correct key for querying (user)
+                user: req.user.userId 
             },
             { $set: updates }, 
             { new: true, runValidators: true } 
@@ -58,7 +61,8 @@ router.delete("/:id", protect, async (req, res) => {
     try {
         const bookmark = await Bookmark.findOneAndDelete({ 
             _id: req.params.id, 
-            user: req.user.userId // <-- 🚨 CRITICAL FIX 4: Change userId to user
+            // 🚨 CRITICAL FIX: Use the correct key for querying (user)
+            user: req.user.userId 
         });
 
         if (!bookmark) {

@@ -1,5 +1,3 @@
-// backend/controllers/bookmarkController.js
-
 import Bookmark from '../models/Bookmark.js';
 import { JSDOM } from 'jsdom';
 import multer from 'multer';
@@ -27,35 +25,43 @@ const parseHtmlBookmarks = (htmlContent, userId) => {
         return bookmarks;
     }
 
-    dlElement.childNodes.forEach(node => {
-        // Check for Folder (H3 tag)
-        if (node.tagName === 'H3') {
-            currentFolder = node.textContent ? node.textContent.trim() : 'Uncategorized';
-        }
+    // This logic handles nested HTML elements correctly to identify folders and links
+    const processNodes = (nodes) => {
+        nodes.forEach(node => {
+            if (node.tagName === 'H3') {
+                currentFolder = node.textContent ? node.textContent.trim() : 'Uncategorized';
+            }
 
-        // Check for Bookmark Link (DT tag containing an A tag)
-        if (node.tagName === 'DT') {
-            const anchor = node.querySelector('A');
-            
-            if (anchor) {
-                const url = anchor.getAttribute('HREF'); 
-                const title = anchor.textContent ? anchor.textContent.trim() : 'No Title';
-                const tagsAttribute = anchor.getAttribute('TAGS');
-                const tags = tagsAttribute ? tagsAttribute.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+            if (node.tagName === 'DT') {
+                const anchor = node.querySelector('A');
+                
+                if (anchor) {
+                    const url = anchor.getAttribute('HREF'); 
+                    const title = anchor.textContent ? anchor.textContent.trim() : 'No Title';
+                    const tagsAttribute = anchor.getAttribute('TAGS');
+                    const tags = tagsAttribute ? tagsAttribute.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
 
-                if (url && url.startsWith('http')) { 
-                    bookmarks.push({
-                        title,
-                        url,
-                        folder: currentFolder,
-                        tags: tags,
-                        // CRITICAL: Ensure this key matches your Mongoose Schema's user field
-                        user: userId, 
-                    });
+                    if (url && url.startsWith('http')) { 
+                        bookmarks.push({
+                            title,
+                            url,
+                            // Ensure key is 'folder' for consistency
+                            folder: currentFolder, 
+                            tags: tags,
+                            user: userId, 
+                        });
+                    }
                 }
             }
-        }
-    });
+
+            // Recursively check DL elements for nested folders/links
+            if (node.tagName === 'DL') {
+                processNodes(node.childNodes);
+            }
+        });
+    };
+
+    processNodes(dlElement.childNodes);
 
     return bookmarks;
 };
@@ -81,13 +87,27 @@ export const uploadBookmarks = async (req, res) => {
         console.log(`Parsed ${structuredBookmarks.length} valid bookmarks for insertion.`);
 
         // ordered: false allows some bookmarks to be inserted even if others fail validation (e.g. duplicates)
-        await Bookmark.insertMany(structuredBookmarks, { ordered: false }); 
+        // Set up for better error handling in case of validation failure
+        const insertionResult = await Bookmark.insertMany(structuredBookmarks, { ordered: false }); 
 
         res.status(201).json({ 
-            message: `Successfully uploaded ${structuredBookmarks.length} bookmarks.`,
+            message: `Successfully uploaded ${insertionResult.length} bookmarks.`,
+            insertedCount: insertionResult.length
         });
         
     } catch (error) {
+        // 🚨 ENHANCEMENT: Log detailed error info for Mongoose Validation errors
+        if (error.name === 'ValidationError') {
+            console.error("Mongoose Validation Error:", error.message);
+            // In case of ordered: false, it often throws a BulkWriteError if even one fails
+        } else if (error.name === 'MongoBulkWriteError' && error.writeErrors) {
+            console.error(`Bulk Write Error: ${error.message}. First error details:`, error.writeErrors[0].errmsg);
+            return res.status(400).json({ 
+                message: "Some bookmarks failed validation during upload. Check console for details.",
+                details: error.writeErrors[0].errmsg 
+            });
+        }
+        
         console.error("Critical Upload Error:", error);
         
         return res.status(500).json({ 

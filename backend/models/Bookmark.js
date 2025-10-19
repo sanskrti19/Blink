@@ -21,8 +21,9 @@ const BookmarkSchema = new mongoose.Schema({
         default: 'Uncategorized',
         trim: true,
     },
+    // 🚨 FIX: Changed type from String to [String] to accept the array parsed from HTML.
     tags: {
-        type: String,
+        type: [String], 
         trim: true,
     },
 }, {
