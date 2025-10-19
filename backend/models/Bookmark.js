@@ -1,11 +1,32 @@
-// backend/models/Bookmark.js
 import mongoose from 'mongoose';
+
 const BookmarkSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    title: { type: String, required: true },
-    url: { type: String, required: true },
-    category: { type: String, default: 'Unsorted' },
-    tags: [{ type: String }],
-    dateAdded: { type: Date, default: Date.now }
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User',
+    },
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    url: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    folder: {
+        type: String,
+        default: 'Uncategorized',
+        trim: true,
+    },
+    tags: {
+        type: String,
+        trim: true,
+    },
+}, {
+    timestamps: true,
 });
+
 export default mongoose.model('Bookmark', BookmarkSchema);

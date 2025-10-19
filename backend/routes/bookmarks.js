@@ -1,30 +1,18 @@
 import express from "express";
+ 
+import { getBookmarks, uploadBookmarks, upload } from '../controllers/bookmarkController.js'; 
 import Bookmark from "../models/Bookmark.js";
+import protect from '../middleware/authMiddleware.js';
  
-import authenticateToken from "../middleware/authMiddleware.js"; 
-
+const router = express.Router(); 
+router.get('/', protect, getBookmarks);
+ 
+router.post('/upload', protect, upload.single('bookmarkFile'), uploadBookmarks); 
+                             // The upload route uses the correct 'user' key in the controller.
  
  
- import { getUsersBookmarks,
-   addSingleBookmark,
-  saveBookmarks ,
-deleteSingleBookmark} 
-from '../controllers/bookmarkController.js';
-
-const router = express.Router();
+router.post("/", protect, async (req, res) => {
  
-router.get("/", authenticateToken, async (req, res) => {
-    try {
- 
-        const bookmarks = await Bookmark.find({ userId: req.user.userId }).sort({ dateAdded: -1 });
-        res.json(bookmarks);
-    } catch (err) { 
-        res.status(500).json({ message: "Failed to retrieve bookmarks.", error: err.message });
-    }
-});
- 
-router.post("/", authenticateToken, async (req, res) => {
-     
     const { title, url, description, tags, category } = req.body;
     
     const bookmark = new Bookmark({ 
@@ -33,28 +21,27 @@ router.post("/", authenticateToken, async (req, res) => {
         description, 
         tags, 
         category,  
-        userId: req.user.userId 
+        user: req.user.userId // <-- 🚨 CRITICAL FIX 2: Change userId to user
     });
 
     try {
         const saved = await bookmark.save();
-        res.status(201).json(saved);  
+        res.status(201).json(saved); 
     } catch (err) {
-       
         res.status(400).json({ message: "Failed to create bookmark.", error: err.message });
     }
 });
  
-router.put("/:id", authenticateToken, async (req, res) => {
+router.put("/:id", protect, async (req, res) => {
     const updates = req.body;
     
     try {
         const bookmark = await Bookmark.findOneAndUpdate(
             { 
                 _id: req.params.id, 
-                userId: req.user.userId  
+                user: req.user.userId // <-- 🚨 CRITICAL FIX 3: Change userId to user
             },
-            { $set: updates },  
+            { $set: updates }, 
             { new: true, runValidators: true } 
         );
 
@@ -62,22 +49,19 @@ router.put("/:id", authenticateToken, async (req, res) => {
             return res.status(404).json({ message: "Bookmark not found or unauthorized to update" });
         }
 
-        res.json(bookmark); // Send the updated bookmark back
+        res.json(bookmark); 
     } catch (err) {
         res.status(400).json({ message: "Failed to update bookmark.", error: err.message });
     }
 });
- 
-router.delete("/:id", authenticateToken, async (req, res) => {
+router.delete("/:id", protect, async (req, res) => {
     try {
-        
         const bookmark = await Bookmark.findOneAndDelete({ 
             _id: req.params.id, 
-            userId: req.user.userId 
+            user: req.user.userId // <-- 🚨 CRITICAL FIX 4: Change userId to user
         });
 
         if (!bookmark) {
-            // Use 404 if the resource isn't found OR user is unauthorized (it's the same result)
             return res.status(404).json({ message: "Bookmark not found or unauthorized to delete" });
         }
 
@@ -87,11 +71,4 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     }
 });
 
- 
-
-router.get('/',  getUsersBookmarks);  
-router.post('/upload',  saveBookmarks); 
-
 export default router;
- 
- 

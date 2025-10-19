@@ -50,7 +50,7 @@ const Signup = () => {
       if (response.ok) {
          
         const token = data.token;
-        localStorage.setItem('authToken', token);
+        localStorage.setItem('token', token);
          
         setErrorMessage("Success! Redirecting to home...");
          

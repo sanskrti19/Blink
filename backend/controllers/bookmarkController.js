@@ -1,98 +1,114 @@
+// backend/controllers/bookmarkController.js
+
 import Bookmark from '../models/Bookmark.js';
-import mongoose from 'mongoose';
+import { JSDOM } from 'jsdom';
+import multer from 'multer';
+
+const storage = multer.memoryStorage();
+export const upload = multer({ storage: storage });
 
 /**
- * --- BULK IMPORT LOGIC (For HTML Upload) ---
- * Renaming to better reflect the use in your routes.
+ * Parses the Netscape Bookmark HTML file content into structured JSON data.
+ * @param {string} htmlContent - The raw HTML content of the bookmark file.
+ * @param {string} userId - The ID of the user uploading the bookmarks.
+ * @returns {Array<object>} An array of structured bookmark objects.
  */
-export const saveBookmarks = async (req, res) => {
-    // ... (Your saveBookmarks logic here)
-    try {
-        // req.user.userId is populated by the authenticateToken middleware
-        const userId = req.user.userId; 
-        const newBookmarks = req.body;
-
-        if (!Array.isArray(newBookmarks)) {
-            return res.status(400).json({ msg: "Request body must be an array of bookmarks." });
-        }
-        // ... (rest of your logic)
-        
-        // Clear all existing bookmarks for this user (to replace with new file content)
-        await Bookmark.deleteMany({ userId });
-
-        // Prepare new bookmarks for insertion
-        const bookmarksToInsert = newBookmarks.map(b => ({
-            userId: new mongoose.Types.ObjectId(userId),
-            url: b.url,
-            title: b.title,
-            folder: b.folder || 'Root',
-            tags: b.tags || '',
-        }));
-
-        // Insert all new bookmarks
-        if (bookmarksToInsert.length > 0) {
-            await Bookmark.insertMany(bookmarksToInsert);
-        }
-
-        res.status(201).json({ 
-            msg: `Successfully imported and saved ${bookmarksToInsert.length} bookmarks.`,
-            count: bookmarksToInsert.length
-        });
-
-    } catch (err) {
-        console.error('Error saving bookmarks:', err);
-        res.status(500).json({ msg: 'Server error during bookmark saving.', error: err.message });
+const parseHtmlBookmarks = (htmlContent, userId) => {
+    const bookmarks = [];
+    
+    const dom = new JSDOM(htmlContent);
+    const document = dom.window.document;
+    
+    let currentFolder = 'Uncategorized';
+    
+    const dlElement = document.querySelector('DL');
+    if (!dlElement) {
+        console.warn("Could not find the main <DL> element in the bookmark file.");
+        return bookmarks;
     }
+
+    dlElement.childNodes.forEach(node => {
+        // Check for Folder (H3 tag)
+        if (node.tagName === 'H3') {
+            currentFolder = node.textContent ? node.textContent.trim() : 'Uncategorized';
+        }
+
+        // Check for Bookmark Link (DT tag containing an A tag)
+        if (node.tagName === 'DT') {
+            const anchor = node.querySelector('A');
+            
+            if (anchor) {
+                const url = anchor.getAttribute('HREF'); 
+                const title = anchor.textContent ? anchor.textContent.trim() : 'No Title';
+                const tagsAttribute = anchor.getAttribute('TAGS');
+                const tags = tagsAttribute ? tagsAttribute.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
+
+                if (url && url.startsWith('http')) { 
+                    bookmarks.push({
+                        title,
+                        url,
+                        folder: currentFolder,
+                        tags: tags,
+                        // CRITICAL: Ensure this key matches your Mongoose Schema's user field
+                        user: userId, 
+                    });
+                }
+            }
+        }
+    });
+
+    return bookmarks;
 };
 
-/**
- * --- SINGLE GET LOGIC (For Home Page Load) ---
- */
-export const getUsersBookmarks = async (req, res) => {
-    // ... (Your getUsersBookmarks logic here)
+
+export const uploadBookmarks = async (req, res) => {
+    
+    if (!req.user || !req.user.userId) {
+        console.error("401: Authentication failed for file upload.");
+        return res.status(401).json({ message: "Not authorized. User token invalid or missing." });
+    }
+    
+    if (!req.file) {
+        return res.status(400).json({ message: "No bookmark file uploaded (Multer failed)." });
+    }
+
     try {
         const userId = req.user.userId;
-        const bookmarks = await Bookmark.find({ userId }).sort({ folder: 1, title: 1 });
-        res.status(200).json(bookmarks);
-    } catch (err) {
-        console.error('Error fetching bookmarks:', err);
-        res.status(500).json({ msg: 'Server error fetching bookmarks.', error: err.message });
-    }
-};
+        const htmlContent = req.file.buffer.toString('utf-8');
+        
+        const structuredBookmarks = parseHtmlBookmarks(htmlContent, userId);
+        
+        console.log(`Parsed ${structuredBookmarks.length} valid bookmarks for insertion.`);
 
-/**
- * --- SINGLE ADD LOGIC ---
- */
-export const addSingleBookmark = async (req, res) => {
-    // ... (Your addSingleBookmark logic here)
-    const { title, url, folder, tags } = req.body;
-    // ... (rest of your logic)
-    const bookmark = new Bookmark({ 
-        title, url, folder, tags, userId: req.user.userId 
-    });
-    try {
-        const saved = await bookmark.save();
-        res.status(201).json(saved);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-};
+        // ordered: false allows some bookmarks to be inserted even if others fail validation (e.g. duplicates)
+        await Bookmark.insertMany(structuredBookmarks, { ordered: false }); 
 
-/**
- * --- SINGLE DELETE LOGIC ---
- */
-export const deleteSingleBookmark = async (req, res) => {
-    // ... (Your deleteSingleBookmark logic here)
-    try {
-        const bookmark = await Bookmark.findOneAndDelete({ 
-            _id: req.params.id, 
-            userId: req.user.userId 
+        res.status(201).json({ 
+            message: `Successfully uploaded ${structuredBookmarks.length} bookmarks.`,
         });
-        if (!bookmark) {
-            return res.status(404).json({ message: "Bookmark not found or unauthorized to delete" });
-        }
-        res.json({ message: "Bookmark deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+        
+    } catch (error) {
+        console.error("Critical Upload Error:", error);
+        
+        return res.status(500).json({ 
+            message: "An internal server error occurred during processing.",
+            details: error.message 
+        });
+    }
+};
+
+
+export const getBookmarks = async (req, res) => {
+    try {
+        // Assuming your middleware populates req.user.userId
+        const userId = req.user.userId; 
+        
+        // Ensure this query key 'user' matches the key used during insertion and in the Mongoose schema
+        const bookmarks = await Bookmark.find({ user: userId }).sort({ folder: 1, title: 1 }); 
+        
+        res.json(bookmarks);
+    } catch (error) {
+        console.error('Error fetching bookmarks:', error);
+        res.status(500).json({ message: 'Failed to retrieve bookmarks.' });
     }
 };

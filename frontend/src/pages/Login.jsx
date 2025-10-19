@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// NOTE: For security and persistence, consider switching to Firebase/Firestore 
+// instead of localStorage for token storage and user authentication.
 const API_BASE_URL = "http://localhost:5000/api"; 
 
 const Login = () => {
- const [email, setEmail] = useState(''); 
- const [password, setPassword] = useState(''); 
- const [errorMessage, setErrorMessage] = useState("");
- const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState(''); 
+  const [password, setPassword] = useState(''); 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -14,6 +16,7 @@ const Login = () => {
     setErrorMessage("");
     setIsLoading(true);
 
+    // Initial validation check for empty fields (Line 17 in the corrected file)
     if (!email || !password) {
       setErrorMessage("Please enter both email and password.");
       setIsLoading(false);
@@ -23,6 +26,7 @@ const Login = () => {
     try {
       const loginEndpoint = `${API_BASE_URL}/auth/login`;
       
+      // 1. Send the network request
       const response = await fetch(loginEndpoint, {
         method: "POST",
         headers: {
@@ -31,29 +35,29 @@ const Login = () => {
         body: JSON.stringify({ email, password }), 
       });
 
-      // Attempt to parse JSON. If the server crashes and sends HTML, the catch block handles the SyntaxError.
+      // 2. Attempt to parse JSON. 
       const data = await response.json(); 
 
+      // 3. Handle success (HTTP status 200-299)
       if (response.ok) {
         const token = data.token;
-        // 🚨 CRITICAL: Use the consistent key 'token'
+        // Store the token securely
         localStorage.setItem('token', token); 
         
         setErrorMessage("Success! Logging you in...");
-          
         setTimeout(() => navigate("/home"), 500); 
         
       } else {
-        // Use data.message (from controller) if available, otherwise generic failure
+        // 4. Handle API error (e.g., 401 Unauthorized, 400 Bad Request)
         setErrorMessage(data.message || "Login failed. Invalid credentials or server response.");
       }
 
     } catch (error) {
-        
+      // 5. Handle network errors or JSON parsing failures (e.g., server returned HTML instead of JSON)
       console.error("Login network error:", error);
-      // Informative error message for network issues or JSON parsing failures (HTML response)
-      setErrorMessage("Network error: Could not connect to the server or received invalid data. Please check the backend console for crashes.");
+      setErrorMessage("Network error: Could not connect to the server or received invalid data. Check the backend console.");
     } finally {
+      // 6. Always reset loading state
       setIsLoading(false);
     }
   };
