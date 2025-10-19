@@ -10,4 +10,4 @@ export const BGIMG = "https://assets.nflxext.com/ffe/siteui/vlv3/0b0dad79-ad4d-4
 
  
 
- 
+ export const LOGIN_ILLUSTATION="https://i.pinimg.com/736x/b9/8c/aa/b98caa9cf29478e9ebea716e797f4599.jpg"
