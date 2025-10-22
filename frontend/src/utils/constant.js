@@ -6,8 +6,13 @@ export const PROFILEURL =
 
 export const BGIMG = "https://assets.nflxext.com/ffe/siteui/vlv3/0b0dad79-ad4d-42b7-b779-8518da389976/web/IN-en-20250908-TRIFECTA-perspective_0647b106-80e1-4d25-9649-63099752b49a_small.jpg"
 
+  
  
+ 
+export const EMPTY_IMG = `https://undraw.co/Algolia-logo-blue.svg`;
+export const SIDEBAR = `https://i.pinimg.com/736x/78/20/dd/7820dd394bf1d4c3392bb9105bf2c607.jpg`;
+
 
  
 
- export const LOGIN_ILLUSTATION="https://i.pinimg.com/736x/b9/8c/aa/b98caa9cf29478e9ebea716e797f4599.jpg"
+ export const LOGIN_ILLUSTATION="https://i.pinimg.com/736x/b9/8c/aa/b98caa9cf29478e9ebea716e797f4599.jpg";
