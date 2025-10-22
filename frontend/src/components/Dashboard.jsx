@@ -16,25 +16,21 @@ import {
 const API_BASE_URL = "http://localhost:5000/api";
 
 function Dashboard() {
-  // Sidebar toggle
+ 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
-  // Bookmark management
+ 
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentBookmark, setCurrentBookmark] = useState(null);
-
-  // Modal state
+ 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // File upload
+ 
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
-
-  // ────────────────────────────────────────────────
-  // 🧠 Effects & Data Fetching
+ 
   useEffect(() => {
     fetchBookmarks();
   }, []);
@@ -59,10 +55,7 @@ function Dashboard() {
       setLoading(false);
     }
   };
-
-  // ────────────────────────────────────────────────
-  // 📦 Bookmark Actions
-
+ 
   const handleOpenCreateModal = () => {
     setCurrentBookmark(null);
     setIsModalOpen(true);
@@ -108,9 +101,7 @@ function Dashboard() {
       setTimeout(() => setUploadMessage({ type: "", text: "" }), 3000);
     }
   };
-
-  // ────────────────────────────────────────────────
-  // 📁 File Upload Handlers
+ 
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -180,9 +171,7 @@ function Dashboard() {
         return "text-gray-700 bg-gray-100 border-gray-300";
     }
   };
-
-  // ────────────────────────────────────────────────
-  // ⏳ Loading state
+ 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -191,19 +180,17 @@ function Dashboard() {
       </div>
     );
   }
-
-  // ────────────────────────────────────────────────
-  // ✅ Main UI
+ 
   return (
     <div className="flex min-h-screen bg-gray-50 font-sans relative">
-      {/* Sidebar */}
+      
       <SideNav
         onAddClick={handleOpenCreateModal}
         onLogout={handleLogout}
         isCollapsed={isCollapsed}
       />
 
-      {/* Toggle Sidebar Button */}
+  
       <button
         onClick={toggleCollapse}
         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
@@ -215,8 +202,7 @@ function Dashboard() {
       >
         {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
       </button>
-
-      {/* Main Content */}
+ 
       <div className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${isCollapsed ? "pl-8" : "pl-16"}`}>
         <h1 className="text-4xl font-extrabold text-gray-900 mb-2"> Welcome Back!</h1>
         <p className="text-lg text-gray-500">
@@ -229,7 +215,7 @@ function Dashboard() {
           </div>
         )}
 
-        {/* Upload Section */}
+        
         <details className="bg-white p-6 rounded-3xl shadow-xl border border-gray-200 transition duration-300 open:shadow-2xl">
           <summary className="flex items-center justify-between cursor-pointer font-extrabold text-indigo-600 text-xl hover:text-indigo-700 transition duration-150">
             <span className="flex items-center space-x-3">
@@ -262,7 +248,7 @@ function Dashboard() {
           </form>
         </details>
 
-        {/* Bookmarks */}
+    
         <h2 className="text-3xl font-extrabold text-gray-800 pt-4">
           All Saved Links <span className="text-indigo-500 font-medium text-xl">({bookmarks.length})</span>
         </h2>
@@ -282,7 +268,7 @@ function Dashboard() {
           </div>
         )}
 
-        {/* Modal */}
+      
         <BookmarkFormModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
