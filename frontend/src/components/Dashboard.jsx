@@ -1,24 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
- 
- 
 
 import BookmarkFormModal from "./FormModal";
 import BookmarkCard from "./BookmarkCard";
 import SideNav from "./SideNav";
- 
 
-import {
-  Loader,
-  UploadCloud,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Loader, UploadCloud, ChevronDown } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-function Dashboard() {
+function Dashboard({ darkMode, setDarkMode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
@@ -27,10 +18,14 @@ function Dashboard() {
   const [currentBookmark, setCurrentBookmark] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
+ 
+  useEffect(() => {
+    if (darkMode) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, [darkMode]);
 
   useEffect(() => {
     fetchBookmarks();
@@ -61,17 +56,14 @@ function Dashboard() {
     setCurrentBookmark(null);
     setIsModalOpen(true);
   };
-
   const handleOpenEditModal = (bookmark) => {
     setCurrentBookmark(bookmark);
     setIsModalOpen(true);
   };
-
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentBookmark(null);
   };
-
   const handleSaveOrUpdate = (savedBookmark) => {
     if (currentBookmark) {
       setBookmarks((prev) =>
@@ -118,7 +110,6 @@ function Dashboard() {
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (!file) return;
-
     setIsUploading(true);
     setUploadMessage({ type: "info", text: "Uploading and processing..." });
 
@@ -162,82 +153,64 @@ function Dashboard() {
   const getMessageStyle = () => {
     switch (uploadMessage.type) {
       case "error":
-        return "text-red-700 bg-red-100 border-red-300";
+        return "text-red-700 bg-red-100 border-red-300 dark:text-red-300 dark:bg-red-900/50 dark:border-red-700";
       case "success":
-        return "text-green-700 bg-green-100 border-green-300";
+        return "text-green-700 bg-green-100 border-green-300 dark:text-green-300 dark:bg-green-900/50 dark:border-green-700";
       case "info":
-        return "text-indigo-700 bg-indigo-100 border-indigo-300";
+        return "text-indigo-700 bg-indigo-100 border-indigo-300 dark:text-indigo-300 dark:bg-indigo-900/50 dark:border-indigo-700";
       default:
-        return "text-gray-700 bg-gray-100 border-gray-300";
+        return "text-gray-700 bg-gray-100 border-gray-300 dark:text-gray-300 dark:bg-gray-700/50 dark:border-gray-500";
     }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <Loader className="animate-spin h-8 w-8 text-indigo-600 mr-3" />
-        <div className="text-xl font-medium text-indigo-600">Loading your links...</div>
+      <div className="flex items-center justify-center min-h-screen bg-purple-800 text-white dark:bg-purple-950">
+        <Loader className="animate-spin h-8 w-8 text-white mr-3" />
+        <div className="text-xl font-medium">Loading your links...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans relative">
-       
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-gradient-to-br from-purple-400/30 to-pink-300/20 blur-3xl rounded-full -z-10" />
-      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-tr from-indigo-400/20 to-purple-300/10 blur-3xl rounded-full -z-10" />
+    <div className="flex min-h-screen font-sans relative bg-purple-800 text-white dark:bg-purple-950 dark:text-white transition-colors duration-500">
+      {/* Background blobs */}
+      <div className="absolute top-0 right-0 w-[400px] h-[400px] blur-3xl rounded-full -z-10 bg-purple-400/30 dark:bg-purple-900/30" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] blur-3xl rounded-full -z-10 bg-indigo-400/20 dark:bg-indigo-900/20" />
 
-    
+      {/* SideNav */}
       <SideNav
         onAddClick={handleOpenCreateModal}
         onLogout={handleLogout}
         isCollapsed={isCollapsed}
+        toggleCollapse={toggleCollapse}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
       />
- 
-      <button
-        onClick={toggleCollapse}
-        title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        className={`
-          absolute top-1/2 -translate-y-1/2 z-10 p-2 rounded-full 
-          bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg 
-          transition-all duration-300 ${isCollapsed ? "left-20" : "left-64"}
-        `}
-      >
-        {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
-      </button>
- 
-      <div
-        className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${
-          isCollapsed ? "pl-8" : "pl-16"
-        }`}
-      >
-       
+
+      {/* Main content */}
+      <div className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${isCollapsed ? "pl-8" : "pl-16"}`}>
         <div className="flex justify-between items-center flex-wrap gap-6">
           <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Welcome Back!</h1>
-            <p className="text-lg text-gray-500">
-              Manage your collection of {bookmarks.length} saved links.
-            </p>
+            <h1 className="text-4xl font-extrabold mb-2">Welcome Back!</h1>
+            <p className="text-lg">Manage your collection of {bookmarks.length} saved links.</p>
           </div>
-      <img src= "https://stories.freepiklabs.com/api/vectors/bookmarks/cuate/render?color=&background=complete"
-       alt="Bookmark illustration" 
-
+          <img
+            src="https://stories.freepiklabs.com/api/vectors/bookmarks/cuate/render?color=&background=complete"
+            alt="Bookmark illustration"
             className="w-44 h-44 md:w-56 md:h-56 drop-shadow-xl"
           />
         </div>
 
-     
         {uploadMessage.text && (
-          <div
-            className={`p-4 rounded-xl border-l-4 text-sm font-medium shadow-md ${getMessageStyle()}`}
-          >
+          <div className={`p-4 rounded-xl border-l-4 text-sm font-medium shadow-md ${getMessageStyle()}`}>
             {uploadMessage.text}
           </div>
         )}
 
-        
-        <details className="bg-white p-6 rounded-3xl shadow-xl border border-gray-200 transition duration-300 open:shadow-2xl">
-          <summary className="flex items-center justify-between cursor-pointer font-extrabold text-indigo-600 text-xl hover:text-indigo-700 transition duration-150">
+        {/* Upload Form */}
+        <details className="p-6 rounded-3xl shadow-lg border bg-purple-700/80 dark:bg-purple-800/80 border-gray-300 dark:border-purple-600 transition-colors duration-300">
+          <summary className="flex items-center justify-between cursor-pointer font-extrabold text-xl">
             <span className="flex items-center space-x-3">
               <UploadCloud className="w-6 h-6" />
               <span>Import Bookmarks (.html)</span>
@@ -245,82 +218,54 @@ function Dashboard() {
             <ChevronDown className="w-5 h-5 summary-icon" />
           </summary>
 
-          <form
-            onSubmit={handleUploadSubmit}
-            className="mt-6 space-y-5 border-t pt-5 border-gray-100"
-          >
-            <label className="block text-sm font-medium text-gray-700">
-              Select .html file:
-            </label>
+          <form onSubmit={handleUploadSubmit} className="mt-6 space-y-5 border-t pt-5 border-gray-200 dark:border-purple-600">
+            <label className="block text-sm font-medium">Select .html file:</label>
             <input
               type="file"
               accept=".html"
               onChange={handleFileChange}
               disabled={isUploading}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200 cursor-pointer transition duration-150"
+              className="block w-full text-sm transition-colors duration-300"
             />
             <button
               type="submit"
               disabled={!file || isUploading}
-              className={`w-full py-3 px-6 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center transform hover:scale-[1.01] ${
-                !file || isUploading
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-300/50"
-              }`}
+              className="w-full py-3 px-6 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
             >
-              {isUploading ? (
-                <Loader className="animate-spin h-5 w-5 mr-3 text-white" />
-              ) : (
-                "Start Upload and Save"
-              )}
+              {isUploading ? <Loader className="animate-spin h-5 w-5 mr-3 text-white" /> : "Start Upload and Save"}
             </button>
           </form>
         </details>
 
-         
-        <h2 className="text-3xl font-extrabold text-gray-800 pt-4">
-          All Saved Links{" "}
-          <span className="text-indigo-500 font-medium text-xl">
-            ({bookmarks.length})
-          </span>
+        {/* Bookmarks List */}
+        <h2 className="text-3xl font-extrabold pt-4">
+          All Saved Links <span className="font-medium text-indigo-300">({bookmarks.length})</span>
         </h2>
 
         {bookmarks.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {bookmarks.map((bm) => (
-              <div
-                key={bm._id}
-                className="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
-              >
-                <BookmarkCard
-                  bm={bm}
-                  onEdit={handleOpenEditModal}
-                  onDelete={handleDelete}
-                />
-              </div>
+              <BookmarkCard key={bm._id} bm={bm} onEdit={handleOpenEditModal} onDelete={handleDelete} darkMode={darkMode} />
             ))}
           </div>
         ) : (
-           
-          <div className="flex flex-col items-center justify-center text-center bg-white p-12 rounded-3xl shadow-inner border-2 border-dashed border-gray-300 mt-6">
-            <img src="https://stories.freepiklabs.com/api/vectors/bookmarks/amico/render?color=&background=complete"
-
-            alt="No bookmarks" className="w-56 h-56 mb-6" />
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">
-              No bookmarks yet
-            </h2>
-            <p className="text-gray-500 text-lg mb-4">
-              Start by adding your first link ✨ or import your collection above.
-            </p>
+          <div className="flex flex-col items-center justify-center text-center bg-purple-700/80 dark:bg-purple-800/80 p-12 rounded-3xl shadow-inner border-2 border-purple-600 mt-6">
+            <img
+              src="https://stories.freepiklabs.com/api/vectors/bookmarks/amico/render?color=&background=complete"
+              alt="No bookmarks"
+              className="w-56 h-56 mb-6"
+            />
+            <h2 className="text-3xl font-bold mb-2">No bookmarks yet</h2>
+            <p className="text-lg mb-4">Start by adding your first link or import your collection above.</p>
             <button
               onClick={handleOpenCreateModal}
-              className="bg-purple-600 text-white px-5 py-3 rounded-xl text-lg font-semibold hover:bg-purple-700 transition"
+              className="bg-indigo-600 text-white px-5 py-3 rounded-xl text-lg font-semibold hover:bg-indigo-700 transition"
             >
               + Add Bookmark
             </button>
           </div>
         )}
- 
+
         <BookmarkFormModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}

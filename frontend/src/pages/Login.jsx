@@ -47,39 +47,50 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-white animate-gradient-x bg-[length:300%_300%]">
-       
-      <div className="hidden md:flex w-1/2 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-200">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-500">
+      
+      <div className="hidden md:flex w-1/2 items-center justify-center rounded-2xl
+                      bg-gradient-to-br from-purple-100 to-indigo-200 dark:from-purple-900 dark:to-indigo-950
+                      transition-colors duration-500">
         <img
           src={LOGIN_ILLUSTATION}
           alt="B-link Illustration"
           className="w-3/4 max-w-md drop-shadow-2xl rounded-full animate-float"
         />
       </div>
- 
-      <div className="w-full md:w-1/2 flex items-center justify-center bg-gradient-to-br from-purple-50 to-indigo-100">
-        <div className="w-full max-w-md bg-white/90 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-purple-200">
-          <h1 className="text-3xl font-extrabold text-center text-purple-700 mb-2">
+
+       
+      <div className="w-full md:w-1/2 flex items-center justify-center
+                      bg-[var(--bg-primary)] dark:bg-[var(--bg-primary)] transition-colors duration-500">
+        <div className="w-full max-w-md p-8 rounded-2xl shadow-lg border
+                        bg-white/90 dark:bg-purple-900/70 backdrop-blur-xl
+                        border-purple-200 dark:border-purple-800 transition-all duration-500">
+          <h1 className="text-3xl font-extrabold text-center text-purple-700 dark:text-purple-300 mb-2">
             Welcome back
           </h1>
-          <h2 className="text-2xl font-bold text-center text-indigo-600 mb-1 relative">
+          <h2 className="text-2xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-1 relative">
             Login to{" "}
-            <span className="relative text-purple-600">
+            <span className="relative text-purple-600 dark:text-purple-400">
               B-link
-              <span className="absolute inset-0 blur-sm bg-purple-400 opacity-30 rounded-full"></span>
+              <span className="absolute inset-0 blur-sm bg-purple-400 dark:bg-purple-700 opacity-30 rounded-full"></span>
             </span>
           </h2>
-          <p className="text-center text-gray-500 mb-6 italic">
+          <p className="text-center text-gray-500 dark:text-gray-300 mb-6 italic">
             Connect. Create. Collaborate.
           </p>
- 
+
           <form onSubmit={handleLogin}>
             <input
               type="email"
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
+              className="p-3 w-full mb-3 rounded-lg border
+                         bg-purple-50 dark:bg-purple-950
+                         border-purple-200 dark:border-purple-800
+                         text-gray-900 dark:text-gray-100
+                         focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-600
+                         outline-none transition-all"
               disabled={isLoading}
               required
             />
@@ -89,55 +100,38 @@ const Login = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="p-3 w-full mb-3 bg-purple-50 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 outline-none transition-all"
+              className="p-3 w-full mb-3 rounded-lg border
+                         bg-purple-50 dark:bg-purple-950
+                         border-purple-200 dark:border-purple-800
+                         text-gray-900 dark:text-gray-100
+                         focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-600
+                         outline-none transition-all"
               disabled={isLoading}
               required
             />
 
             {errorMessage && (
-              <p
-                className={`text-sm font-medium mb-3 ${
-                  errorMessage.startsWith("Success")
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
+              <p className={`text-sm font-medium mb-3
+                             ${errorMessage.startsWith("Success") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
                 {errorMessage}
               </p>
             )}
 
             <button
               type="submit"
-              className={`w-full py-3 rounded-lg font-semibold text-white transition-transform ${
-                isLoading
-                  ? "bg-purple-400 cursor-not-allowed flex justify-center items-center"
-                  : "bg-gradient-to-r from-purple-500 to-indigo-600 hover:scale-[1.03] shadow-lg hover:shadow-indigo-200"
-              }`}
+              className={`w-full py-3 rounded-lg font-semibold text-white transition-transform
+                          ${isLoading
+                            ? "bg-purple-400 dark:bg-purple-700 cursor-not-allowed flex justify-center items-center"
+                            : "bg-gradient-to-r from-purple-500 to-indigo-600 dark:from-purple-700 dark:to-indigo-700 hover:scale-[1.03] shadow-lg hover:shadow-indigo-200 dark:hover:shadow-purple-900"
+                          }`}
               disabled={isLoading}
             >
               {isLoading ? (
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 
-                    0 5.373 0 12h4zm2 5.291A7.962 7.962 
-                    0 014 12H0c0 3.042 1.135 5.824 3 
-                    7.938l3-2.647z"
-                  ></path>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                     xmlns="http://www.w3.org/2000/svg"
+                     fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               ) : (
                 "Log In"
@@ -147,10 +141,10 @@ const Login = () => {
 
           <p
             onClick={() => navigate("/signup")}
-            className="text-sm text-center mt-4 text-gray-600 cursor-pointer hover:text-purple-600 transition-all"
+            className="text-sm text-center mt-4 text-gray-600 dark:text-gray-300 cursor-pointer hover:text-purple-600 dark:hover:text-purple-400 transition-all"
           >
             Don’t have an account?{" "}
-            <span className="font-semibold text-purple-700 hover:underline">
+            <span className="font-semibold text-purple-700 dark:text-purple-300 hover:underline">
               Join the fun
             </span>
           </p>
