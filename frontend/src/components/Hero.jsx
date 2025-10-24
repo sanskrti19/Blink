@@ -8,7 +8,8 @@ const Hero = () => {
       <div className="max-w-5xl mx-auto">
         
         
-        <h1 className="text-7xl md:text-8xl font-extrabold mb-6 leading-tight">
+        <h1 className="text-7xl md:text-8xl font-extrabold mb-6 leading-tight
+        text-indigo-400">
           One place for all your 
           <span className="text-indigo-600 block sm:inline-block"> Chrome Bookmarks.</span>
         </h1>
@@ -37,9 +38,17 @@ const Hero = () => {
 
         <div className="mt-16 w-full p-2 bg-white rounded-xl shadow-2xl border border-gray-100">
           
-            <div className="w-full h-96 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-lg">
-                App Dashboard Screenshot Placeholder
-            </div>
+           <div className="w-full h-96 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl shadow-inner flex flex-col items-center justify-center text-gray-500 text-lg font-medium relative overflow-hidden">
+  <img 
+    src="https://stories.freepiklabs.com/storage/101438/Laptop_Mesa-de-trabajo-1.svg" 
+    alt="App Dashboard Placeholder"
+    className="h-80 md:h-90 object-contain opacity-96 transition-transform duration-500 hover:scale-105"
+  />
+  <p className="mt-4 text-gray-600 text-center">
+  {/* //  App Dashboard Screenshot Placeholder */}
+  </p>
+</div>
+
         </div>
       </div>
     </section>

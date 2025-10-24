@@ -11,21 +11,15 @@ const API_BASE_URL = "http://localhost:5000/api";
 
 function Dashboard({ darkMode, setDarkMode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
-
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentBookmark, setCurrentBookmark] = useState(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
- 
-  useEffect(() => {
-    if (darkMode) document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-  }, [darkMode]);
+
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   useEffect(() => {
     fetchBookmarks();
@@ -56,14 +50,17 @@ function Dashboard({ darkMode, setDarkMode }) {
     setCurrentBookmark(null);
     setIsModalOpen(true);
   };
+
   const handleOpenEditModal = (bookmark) => {
     setCurrentBookmark(bookmark);
     setIsModalOpen(true);
   };
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCurrentBookmark(null);
   };
+
   const handleSaveOrUpdate = (savedBookmark) => {
     if (currentBookmark) {
       setBookmarks((prev) =>
@@ -165,7 +162,7 @@ function Dashboard({ darkMode, setDarkMode }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-purple-800 text-white dark:bg-purple-950">
+      <div className="flex items-center justify-center min-h-screen bg-purple-400 text-white dark:bg-purple-950">
         <Loader className="animate-spin h-8 w-8 text-white mr-3" />
         <div className="text-xl font-medium">Loading your links...</div>
       </div>
@@ -173,12 +170,7 @@ function Dashboard({ darkMode, setDarkMode }) {
   }
 
   return (
-    <div className="flex min-h-screen font-sans relative bg-purple-800 text-white dark:bg-purple-950 dark:text-white transition-colors duration-500">
-      {/* Background blobs */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] blur-3xl rounded-full -z-10 bg-purple-400/30 dark:bg-purple-900/30" />
-      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] blur-3xl rounded-full -z-10 bg-indigo-400/20 dark:bg-indigo-900/20" />
-
-      {/* SideNav */}
+    <div className="flex min-h-screen transition-colors duration-500   text-gray-900 dark:bg-purple-650 dark:text-dark- purple relative">
       <SideNav
         onAddClick={handleOpenCreateModal}
         onLogout={handleLogout}
@@ -188,12 +180,17 @@ function Dashboard({ darkMode, setDarkMode }) {
         setDarkMode={setDarkMode}
       />
 
-      {/* Main content */}
-      <div className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${isCollapsed ? "pl-8" : "pl-16"}`}>
+      <div
+        className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${
+          isCollapsed ? "pl-8" : "pl-16"
+        }`}
+      >
         <div className="flex justify-between items-center flex-wrap gap-6">
           <div>
             <h1 className="text-4xl font-extrabold mb-2">Welcome Back!</h1>
-            <p className="text-lg">Manage your collection of {bookmarks.length} saved links.</p>
+            <p className="text-lg">
+              Manage your collection of {bookmarks.length} saved links.
+            </p>
           </div>
           <img
             src="https://stories.freepiklabs.com/api/vectors/bookmarks/cuate/render?color=&background=complete"
@@ -203,13 +200,14 @@ function Dashboard({ darkMode, setDarkMode }) {
         </div>
 
         {uploadMessage.text && (
-          <div className={`p-4 rounded-xl border-l-4 text-sm font-medium shadow-md ${getMessageStyle()}`}>
+          <div
+            className={`p-4 rounded-xl border-l-4 text-sm font-medium shadow-md ${getMessageStyle()}`}
+          >
             {uploadMessage.text}
           </div>
         )}
 
-        {/* Upload Form */}
-        <details className="p-6 rounded-3xl shadow-lg border bg-purple-700/80 dark:bg-purple-800/80 border-gray-300 dark:border-purple-600 transition-colors duration-300">
+        <details className="p-6 rounded-3xl shadow-lg border bg-purple-50 dark:bg-purple-800/80 border-gray-300 dark:border-purple-600 transition-colors duration-300">
           <summary className="flex items-center justify-between cursor-pointer font-extrabold text-xl">
             <span className="flex items-center space-x-3">
               <UploadCloud className="w-6 h-6" />
@@ -218,8 +216,13 @@ function Dashboard({ darkMode, setDarkMode }) {
             <ChevronDown className="w-5 h-5 summary-icon" />
           </summary>
 
-          <form onSubmit={handleUploadSubmit} className="mt-6 space-y-5 border-t pt-5 border-gray-200 dark:border-purple-600">
-            <label className="block text-sm font-medium">Select .html file:</label>
+          <form
+            onSubmit={handleUploadSubmit}
+            className="mt-6 space-y-5 border-t pt-5 border-gray-200 dark:border-purple-600"
+          >
+            <label className="block text-sm font-medium">
+              Select .html file:
+            </label>
             <input
               type="file"
               accept=".html"
@@ -232,31 +235,45 @@ function Dashboard({ darkMode, setDarkMode }) {
               disabled={!file || isUploading}
               className="w-full py-3 px-6 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
             >
-              {isUploading ? <Loader className="animate-spin h-5 w-5 mr-3 text-white" /> : "Start Upload and Save"}
+              {isUploading ? (
+                <Loader className="animate-spin h-5 w-5 mr-3 text-white" />
+              ) : (
+                "Start Upload and Save"
+              )}
             </button>
           </form>
         </details>
 
-        {/* Bookmarks List */}
         <h2 className="text-3xl font-extrabold pt-4">
-          All Saved Links <span className="font-medium text-indigo-300">({bookmarks.length})</span>
+          All Saved Links{" "}
+          <span className="font-medium text-indigo-300">
+            ({bookmarks.length})
+          </span>
         </h2>
 
         {bookmarks.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {bookmarks.map((bm) => (
-              <BookmarkCard key={bm._id} bm={bm} onEdit={handleOpenEditModal} onDelete={handleDelete} darkMode={darkMode} />
+              <BookmarkCard
+                key={bm._id}
+                bm={bm}
+                onEdit={handleOpenEditModal}
+                onDelete={handleDelete}
+                darkMode={darkMode}
+              />
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-center bg-purple-700/80 dark:bg-purple-800/80 p-12 rounded-3xl shadow-inner border-2 border-purple-600 mt-6">
+          <div className="flex flex-col items-center justify-center text-center bg-purple-50 dark:bg-purple-800/80 p-12 rounded-3xl shadow-inner border-2 border-purple-600 mt-6">
             <img
               src="https://stories.freepiklabs.com/api/vectors/bookmarks/amico/render?color=&background=complete"
               alt="No bookmarks"
               className="w-56 h-56 mb-6"
             />
             <h2 className="text-3xl font-bold mb-2">No bookmarks yet</h2>
-            <p className="text-lg mb-4">Start by adding your first link or import your collection above.</p>
+            <p className="text-lg mb-4">
+              Start by adding your first link or import your collection above.
+            </p>
             <button
               onClick={handleOpenCreateModal}
               className="bg-indigo-600 text-white px-5 py-3 rounded-xl text-lg font-semibold hover:bg-indigo-700 transition"
