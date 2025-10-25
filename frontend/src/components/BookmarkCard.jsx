@@ -1,5 +1,6 @@
 import React from 'react';
 import { Trash2, Edit, Tag, Folder } from 'lucide-react';
+ 
 
 const BookmarkCard = ({ bm, onEdit, onDelete, darkMode }) => (
   <div
@@ -32,6 +33,7 @@ const BookmarkCard = ({ bm, onEdit, onDelete, darkMode }) => (
     </p>
 
     <div className="flex flex-wrap gap-2 mb-4">
+ 
       <span className={`
         flex items-center px-3 py-1 rounded-full text-xs font-medium transition
         ${darkMode ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700'}
@@ -39,24 +41,29 @@ const BookmarkCard = ({ bm, onEdit, onDelete, darkMode }) => (
         <Folder className="w-3 h-3 mr-1" />
         {bm.folder || 'Root'}
       </span>
-
+ 
       {bm.tags && Array.isArray(bm.tags) && bm.tags.slice(0, 3).map((tag, index) => (
-        <span key={index} className={`
-          flex items-center px-3 py-1 rounded-full text-xs font-medium transition
-          ${darkMode ? 'bg-purple-900 text-purple-300' : 'bg-gray-200 text-gray-700'}
-        `}>
+        <span 
+          key={index} 
+          className="flex items-center px-3 py-1 rounded-full text-xs font-medium transition"
+           
+          style={{ 
+            backgroundColor: `${tag.color}22`,  
+            color: tag.color  
+          }}
+        >
           <Tag className="w-3 h-3 mr-1"/>
-          {tag}
+          {tag.name} 
         </span>
       ))}
     </div>
-
+ 
     <div className={`flex justify-end gap-3 mt-auto pt-3 border-t transition ${darkMode ? 'border-purple-700' : 'border-purple-600'}`}>
       <button
         onClick={() => onEdit(bm)}
         className={`
           p-2 rounded-full transition duration-150
-          ${darkMode ? 'bg-indigo-900 text-indigo-300 hover:text-indigo-100 hover:bg-indigo-800' : 'bg-indigo-50 text-indigo-500 hover:text-indigo-700'}
+        'bg-indigo-900 text-indigo-300 hover:text-indigo-100 hover:bg-indigo-800' : 'bg-indigo-50 text-indigo-500 hover:text-indigo-700'}
         `}
         title="Edit Bookmark"
       >

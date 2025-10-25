@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-import BookmarkFormModal from "./FormModal";
+  
+import FormModal from "./FormModal";
 import BookmarkCard from "./BookmarkCard";
 import SideNav from "./SideNav";
 
 import { Loader, UploadCloud, ChevronDown } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL =   'http://localhost:5000/api';
+ 
 
 function Dashboard({ darkMode, setDarkMode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -18,6 +18,18 @@ function Dashboard({ darkMode, setDarkMode }) {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
+  const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => {
+        setIsModalOpen(false);
+        setBookmarkToEdit(null); // Clear the bookmark being edited when closing
+    };
+
+    // Function to handle opening the modal for editing
+    const handleEdit = (bookmark) => {
+        setBookmarkToEdit(bookmark);
+        openModal();
+    };
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
@@ -283,13 +295,15 @@ function Dashboard({ darkMode, setDarkMode }) {
           </div>
         )}
 
-        <BookmarkFormModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          bookmarkToEdit={currentBookmark}
-          onSave={handleSaveOrUpdate}
-          setGlobalMessage={setUploadMessage}
-        />
+    // NEW CORRECT LINE
+<FormModal
+  isOpen={isModalOpen}
+  onClose={closeModal}
+  bookmarkToEdit={bookmarkToEdit}
+  onSave={handleSaveOrUpdate} // <--- CORRECTED: Use the existing function
+  setGlobalMessage={setUploadMessage} // <--- FIX FOR POTENTIAL NEXT ERROR
+  API_BASE_URL={API_BASE_URL} 
+/>
       </div>
     </div>
   );

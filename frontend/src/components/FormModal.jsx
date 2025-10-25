@@ -2,27 +2,58 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { X, Loader, BookOpen, Tag, Folder, Send, Save } from 'lucide-react';
 
+// Define a list of colors for deterministic assignment (must match backend parser)
+const COLORS = [
+    "#6366F1", // indigo
+    "#10B981", // green
+    "#F59E0B", // amber
+    "#EC4899", // pink
+    "#3B82F6", // blue
+    "#8B5CF6", // violet
+    "#F43F5E", // rose
+];
+
+// Helper to deterministically assign a color based on the tag name
+const getTagColor = (tagName) => {
+    let hash = 0;
+    for (let i = 0; i < tagName.length; i++) {
+        hash = tagName.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % COLORS.length;
+    return COLORS[index];
+};
+
+
 const FormModal = ({ isOpen, onClose, bookmarkToEdit, onSave, setGlobalMessage, API_BASE_URL }) => {
-    const [formData, setFormData] = useState({
+    
+    // Initial state for form data, using a string for tags input
+    const initialFormData = {
         title: '',
         url: '',
         folder: '',
         tags: '', 
-    });
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
     const [isSaving, setIsSaving] = useState(false);
+
+    // 💡 REMOVED: The unused `const [tags, setTags] = useState([]);` state
 
     useEffect(() => {
         if (bookmarkToEdit) {
-     
+            // Convert the array of tag objects back to a comma-separated string for the input field
+            const tagsString = Array.isArray(bookmarkToEdit.tags) 
+                ? bookmarkToEdit.tags.map(t => t.name).join(', ') 
+                : '';
+
             setFormData({
                 title: bookmarkToEdit.title || '',
                 url: bookmarkToEdit.url || '',
                 folder: bookmarkToEdit.folder || '',
-                tags: Array.isArray(bookmarkToEdit.tags) ? bookmarkToEdit.tags.join(', ') : (bookmarkToEdit.tags || ''),
+                tags: tagsString, // Use the comma-separated string
             });
         } else {
-          
-            setFormData({ title: '', url: '', folder: '', tags: '' });
+            setFormData(initialFormData);
         }
     }, [bookmarkToEdit, isOpen]);
 
@@ -45,14 +76,21 @@ const FormModal = ({ isOpen, onClose, bookmarkToEdit, onSave, setGlobalMessage, 
         }
 
         try {
-            const tagsArray = formData.tags
+            // 🔑 CRITICAL FIX: Convert comma-separated string to array of { name, color } objects
+            const structuredTags = formData.tags
                 .split(',')
                 .map(t => t.trim())
-                .filter(t => t.length > 0);
+                .filter(t => t.length > 0)
+                .map(tagName => ({
+                    name: tagName,
+                    color: getTagColor(tagName), // Assign the deterministic color
+                }));
 
             const payload = {
-                ...formData,
-                tags: tagsArray,
+                title: formData.title, // Explicitly list fields for clarity/safety
+                url: formData.url,
+                folder: formData.folder,
+                tags: structuredTags, // Send the structured array
             };
 
             const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -60,11 +98,9 @@ const FormModal = ({ isOpen, onClose, bookmarkToEdit, onSave, setGlobalMessage, 
             let successMessage;
 
             if (bookmarkToEdit) {
-                
                 response = await axios.put(`${API_BASE_URL}/bookmarks/${bookmarkToEdit._id}`, payload, config);
                 successMessage = 'Bookmark updated successfully!';
             } else {
-                
                 response = await axios.post(`${API_BASE_URL}/bookmarks`, payload, config);
                 successMessage = 'New bookmark created successfully!';
             }
@@ -81,7 +117,7 @@ const FormModal = ({ isOpen, onClose, bookmarkToEdit, onSave, setGlobalMessage, 
         }
     };
 
-    const titleText = bookmarkToEdit ? 'Edit Bookmark' : 'Add New Bookmark';
+    const titleText = bookmarkToEdit ? 'Edit Bookmark' : 'Create New Bookmark'; // Corrected text
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 backdrop-blur-sm transition-opacity">

@@ -72,6 +72,18 @@ router.delete("/:id", protect, async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Failed to delete bookmark.", error: err.message });
     }
+
+    // PUT /bookmarks/:id
+router.put("/:id", async (req, res) => {
+  const { tags } = req.body;
+  try {
+    const updated = await Bookmark.findByIdAndUpdate(req.params.id, { tags }, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update tags" });
+  }
+});
+
 });
 
 export default router;
