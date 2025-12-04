@@ -117,7 +117,7 @@ const Signup = () => {
 
             <input
               ref={passwordRef}
-              type="password"
+              type=""
               placeholder="Password"
               className="p-3 w-full mb-3 rounded-lg border
                          bg-purple-50 dark:bg-purple-950

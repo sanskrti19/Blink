@@ -1,89 +1,54 @@
+import Bookmark from '../models/Bookmark.js';
+import { categorizeBookmark, getTagColor } from '../utils/bookmarkHelpers.js';
 import express from "express";
-
-import { getBookmarks, uploadBookmarks, upload } from '../controllers/bookmarkController.js'; 
-import Bookmark from "../models/Bookmark.js";
-import protect from '../middleware/authMiddleware.js';
-
-const router = express.Router(); 
-router.get('/', protect, getBookmarks);
-
-router.post('/upload', protect, upload.single('bookmarkFile'), uploadBookmarks); 
+import  authMiddleware  from "../middleware/authMiddleware.js";
+import {
+  getBookmarks,
  
+  uploadBookmarks,
+  upload,
+} from "../controllers/bookmarkController.js";
 
 
-router.post("/", protect, async (req, res) => {
 
-    const { title, url, description, tags, category } = req.body;
-    
-    const bookmark = new Bookmark({ 
-        title, 
-        url, 
-        description, 
-        tags, 
-        category,  
-    
-        user: req.user.userId 
-    });
-
-    try {
-        const saved = await bookmark.save();
-        res.status(201).json(saved); 
-    } catch (err) {
-        res.status(400).json({ message: "Failed to create bookmark.", error: err.message });
-    }
-});
-
-router.put("/:id", protect, async (req, res) => {
-    const updates = req.body;
-    
-    try {
-        const bookmark = await Bookmark.findOneAndUpdate(
-            { 
-                _id: req.params.id, 
-                
-                user: req.user.userId 
-            },
-            { $set: updates }, 
-            { new: true, runValidators: true } 
-        );
-
-        if (!bookmark) {
-            return res.status(404).json({ message: "Bookmark not found or unauthorized to update" });
-        }
-
-        res.json(bookmark); 
-    } catch (err) {
-        res.status(400).json({ message: "Failed to update bookmark.", error: err.message });
-    }
-});
-router.delete("/:id", protect, async (req, res) => {
-    try {
-        const bookmark = await Bookmark.findOneAndDelete({ 
-            _id: req.params.id, 
-          
-            user: req.user.userId 
-        });
-
-        if (!bookmark) {
-            return res.status(404).json({ message: "Bookmark not found or unauthorized to delete" });
-        }
-
-        res.json({ message: "Bookmark deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ message: "Failed to delete bookmark.", error: err.message });
+export const createBookmark = async (req, res) => {
+    if (!req.user || !req.user.userId) {
+        return res.status(401).json({ message: 'Authentication required.' });
     }
 
-    // PUT /bookmarks/:id
-router.put("/:id", async (req, res) => {
-  const { tags } = req.body;
-  try {
-    const updated = await Bookmark.findByIdAndUpdate(req.params.id, { tags }, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ message: "Failed to update tags" });
-  }
-});
+    try {
+        const { url, title, folder } = req.body;
 
-});
+         
+        const category = categorizeBookmark(url, title);
+ 
+        const structuredTags = [
+            {
+                name: category,
+                color: getTagColor(category),
+            }
+        ];
+
+        const bookmarkData = {
+            user: req.user.userId,
+            title,
+            url,
+            folder: folder || 'Uncategorized',
+            tags: structuredTags
+        };
+
+        const newBookmark = await Bookmark.create(bookmarkData);
+
+        res.status(201).json(newBookmark);
+
+    } catch (error) {
+        console.error('Error creating bookmark:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+const router = express.Router();
+router.get("/", getBookmarks);
+router.post("/", createBookmark);
+router.post("/upload", authMiddleware, upload.single("file"), uploadBookmarks);
 
 export default router;

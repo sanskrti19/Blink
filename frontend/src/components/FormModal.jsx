@@ -12,8 +12,7 @@ const COLORS = [
     "#8B5CF6", // violet
     "#F43F5E", // rose
 ];
-
-// Helper to deterministically assign a color based on the tag name
+ 
 const getTagColor = (tagName) => {
     let hash = 0;
     for (let i = 0; i < tagName.length; i++) {
@@ -76,21 +75,21 @@ const FormModal = ({ isOpen, onClose, bookmarkToEdit, onSave, setGlobalMessage, 
         }
 
         try {
-            // 🔑 CRITICAL FIX: Convert comma-separated string to array of { name, color } objects
+           
             const structuredTags = formData.tags
                 .split(',')
                 .map(t => t.trim())
                 .filter(t => t.length > 0)
                 .map(tagName => ({
                     name: tagName,
-                    color: getTagColor(tagName), // Assign the deterministic color
+                    color: getTagColor(tagName), 
                 }));
 
             const payload = {
-                title: formData.title, // Explicitly list fields for clarity/safety
+                title: formData.title, 
                 url: formData.url,
                 folder: formData.folder,
-                tags: structuredTags, // Send the structured array
+                tags: structuredTags, 
             };
 
             const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -117,7 +116,7 @@ const FormModal = ({ isOpen, onClose, bookmarkToEdit, onSave, setGlobalMessage, 
         }
     };
 
-    const titleText = bookmarkToEdit ? 'Edit Bookmark' : 'Create New Bookmark'; // Corrected text
+    const titleText = bookmarkToEdit ? 'Edit Bookmark' : 'Create New Bookmark';  
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-75 backdrop-blur-sm transition-opacity">
