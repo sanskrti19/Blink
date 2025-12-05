@@ -22,10 +22,10 @@ function Dashboard({ darkMode, setDarkMode }) {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
         setIsModalOpen(false);
-        setBookmarkToEdit(null); // Clear the bookmark being edited when closing
+        setBookmarkToEdit(null);  
     };
 
-    // Function to handle opening the modal for editing
+     
     const handleEdit = (bookmark) => {
         setBookmarkToEdit(bookmark);
         openModal();
@@ -295,13 +295,13 @@ function Dashboard({ darkMode, setDarkMode }) {
           </div>
         )}
 
-    // NEW CORRECT LINE
+   
 <FormModal
   isOpen={isModalOpen}
   onClose={closeModal}
   bookmarkToEdit={bookmarkToEdit}
-  onSave={handleSaveOrUpdate} // <--- CORRECTED: Use the existing function
-  setGlobalMessage={setUploadMessage} // <--- FIX FOR POTENTIAL NEXT ERROR
+  onSave={handleSaveOrUpdate}  
+  setGlobalMessage={setUploadMessage}  
   API_BASE_URL={API_BASE_URL} 
 />
       </div>

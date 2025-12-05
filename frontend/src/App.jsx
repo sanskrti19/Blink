@@ -18,14 +18,10 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <Dashboard  />
-              </PrivateRoute>
-            }
-          />
+          <Route element={<PrivateRoute />}>
+  <Route path="/home" element={<Dashboard />} />
+</Route>
+
           <Route path="*" element={<Landing />} />
         </Routes>
        
