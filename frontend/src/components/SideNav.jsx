@@ -58,16 +58,16 @@ const SideNav = ({
       </div>
 
       <nav className="flex-1 flex flex-col space-y-2">
-        {/* Dashboard */}
-        <button
+         
+        {/* <button
           onClick={() => navigate("/")}
           className="flex items-center p-3 rounded-xl bg-white hover:bg-purple-100 text-gray-700 transition duration-200 font-semibold"
         >
           <Home className="w-5 h-5" />
           {!isCollapsed && <span className="ml-3 font-semibold">Dashboard</span>}
-        </button>
+        </button> */}
 
-        {/* Tags Dropdown */}
+        
         <div>
           <button
             onClick={handleTagsClick}
@@ -78,7 +78,7 @@ const SideNav = ({
             <span>{isTagDropdownOpen ? <ChevronUp className="ml-auto" /> : <ChevronDown className="ml-auto" />}</span>
           </button>
 
-          {/* ✅ Grouped by color */}
+           
           {isTagDropdownOpen && (
             <div className="bg-white shadow-md rounded-lg mt-2 p-2 space-y-4 max-h-64 overflow-y-auto">
               {Object.entries(groupedTags).map(([color, tagList]) => (
@@ -110,7 +110,7 @@ const SideNav = ({
           )}
         </div>
 
-        {/* Add Bookmark */}
+      
         <button
           onClick={onAddClick}
           className="flex items-center p-3 rounded-xl mt-4 bg-purple-600 hover:bg-purple-700 text-white shadow-lg transition duration-200 font-semibold"
@@ -120,7 +120,7 @@ const SideNav = ({
         </button>
       </nav>
 
-      {/* Decorative Image */}
+     
       <div className="flex justify-center mb-3">
         <img
           src="https://stories.freepiklabs.com/api/vectors/bye/rafiki/render?color=&background=complete"
