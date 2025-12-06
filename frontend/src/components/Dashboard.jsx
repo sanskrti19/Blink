@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
-  
+
 import FormModal from "./FormModal";
 import BookmarkCard from "./BookmarkCard";
 import SideNav from "./SideNav";
 
 import { Loader, UploadCloud, ChevronDown } from "lucide-react";
-const API_BASE_URL =   'http://localhost:5000/api';
- 
+
+const API_BASE_URL = "http://localhost:5000/api";
 
 function Dashboard({ darkMode, setDarkMode }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -19,16 +19,20 @@ function Dashboard({ darkMode, setDarkMode }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
   const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => {setIsModalOpen(false);
-     setBookmarkToEdit(null);  
-    };
 
-     
-    const handleEdit = (bookmark) => {
-        setBookmarkToEdit(bookmark);
-        openModal();
-    };
+  // NEW: multi-tag filter state
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setBookmarkToEdit(null);
+  };
+
+  const handleEdit = (bookmark) => {
+    setBookmarkToEdit(bookmark);
+    openModal();
+  };
 
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
@@ -123,6 +127,9 @@ function Dashboard({ darkMode, setDarkMode }) {
 
     const token = localStorage.getItem("token");
     const formData = new FormData();
+
+    // NOTE: backend expects req.file; make sure field name here
+    // matches upload.single("bookmarkFile") or upload.single("file") in your route
     formData.append("bookmarkFile", file);
 
     try {
@@ -132,10 +139,17 @@ function Dashboard({ darkMode, setDarkMode }) {
           Authorization: `Bearer ${token}`,
         },
       };
-      const response = await axios.post(`${API_BASE_URL}/bookmarks/upload`, formData, config);
+      const response = await axios.post(
+        `${API_BASE_URL}/bookmarks/upload`,
+        formData,
+        config
+      );
       setFile(null);
       e.target.reset();
-      setUploadMessage({ type: "success", text: response.data.message || "Bookmarks uploaded!" });
+      setUploadMessage({
+        type: "success",
+        text: response.data.message || "Bookmarks uploaded!",
+      });
 
       setTimeout(() => {
         fetchBookmarks();
@@ -171,6 +185,46 @@ function Dashboard({ darkMode, setDarkMode }) {
     }
   };
 
+  // 🔹 Build unique tags list for sidebar from bookmarks
+  const tagsForSidebar = useMemo(() => {
+    const tagMap = new Map(); // key = name|color -> { name, color, count }
+
+    bookmarks.forEach((bm) => {
+      (bm.tags || []).forEach((tag) => {
+        if (!tag?.name) return;
+        const key = `${tag.name}|${tag.color || ""}`;
+        if (!tagMap.has(key)) {
+          tagMap.set(key, {
+            name: tag.name,
+            color: tag.color || "#a855f7", // fallback purple
+            count: 1,
+          });
+        } else {
+          tagMap.get(key).count += 1;
+        }
+      });
+    });
+
+    return Array.from(tagMap.values());
+  }, [bookmarks]);
+
+  // 🔹 Multi-tag filter: OR logic
+  const filteredBookmarks = useMemo(() => {
+    if (!selectedTags.length) return bookmarks;
+    return bookmarks.filter((bm) =>
+      (bm.tags || []).some((tag) => selectedTags.includes(tag.name))
+    );
+  }, [bookmarks, selectedTags]);
+
+  // 🔹 Toggle tag selection (multi-select)
+  const handleToggleTag = (tagName) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagName)
+        ? prev.filter((t) => t !== tagName)
+        : [...prev, tagName]
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-purple-400 text-white dark:bg-purple-950">
@@ -181,7 +235,7 @@ function Dashboard({ darkMode, setDarkMode }) {
   }
 
   return (
-    <div className="flex min-h-screen transition-colors duration-500   text-gray-900 dark:bg-purple-650 dark:text-dark- purple relative">
+    <div className="flex min-h-screen transition-colors duration-500 text-gray-900 dark:bg-purple-650 dark:text-dark- purple relative">
       <SideNav
         onAddClick={handleOpenCreateModal}
         onLogout={handleLogout}
@@ -189,6 +243,9 @@ function Dashboard({ darkMode, setDarkMode }) {
         toggleCollapse={toggleCollapse}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
+        tags={tagsForSidebar}
+        selectedTags={selectedTags}
+        onToggleTag={handleToggleTag}
       />
 
       <div
@@ -202,6 +259,12 @@ function Dashboard({ darkMode, setDarkMode }) {
             <p className="text-lg">
               Manage your collection of {bookmarks.length} saved links.
             </p>
+            {selectedTags.length > 0 && (
+              <p className="text-sm text-purple-700 mt-1">
+                Filtering by tags: {selectedTags.join(", ")} (
+                {filteredBookmarks.length} shown)
+              </p>
+            )}
           </div>
           <img
             src="https://stories.freepiklabs.com/api/vectors/bookmarks/cuate/render?color=&background=complete"
@@ -230,66 +293,53 @@ function Dashboard({ darkMode, setDarkMode }) {
           <form
             onSubmit={handleUploadSubmit}
             className="mt-6 space-y-5 border-t pt-5 border-gray-200 dark:border-purple-600"
-          >    
+          >
             <div className="flex items-center gap-4 mt-4">
-  <input
-    type="file"
-    accept=".html"
-    onChange={handleFileChange}
-    disabled={isUploading}
-    className="
-      block w-60 text-sm font-medium 
-      px-3 py-2 
-      rounded-lg border border-gray-300 
-      bg-white text-gray-800
-      dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100
-      transition-all
-    "
-  />
+              <input
+                type="file"
+                accept=".html"
+                onChange={handleFileChange}
+                disabled={isUploading}
+                className="
+                  block w-60 text-sm font-medium 
+                  px-3 py-2 
+                  rounded-lg border border-gray-300 
+                  bg-white text-gray-800
+                  dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100
+                  transition-all
+                "
+              />
 
-  <button
-    type="submit"
-    disabled={!file || isUploading}
-    className="
-      py-2 px-5 rounded-lg font-semibold text-sm
-      shadow-md bg-indigo-900 text-white
-      hover:bg-indigo-700 active:scale-95
-      disabled:opacity-90 disabled:cursor-not-allowed
-      transition-all
-    "
-  >
-    {isUploading ? (
-      <Loader className="animate-spin h-4 w-4 text-white" />
-    ) : (
-      "Upload"
-    )}
-  </button>
-</div>
-
+              <button
+                type="submit"
+                disabled={!file || isUploading}
+                className="
+                  py-2 px-5 rounded-lg font-semibold text-sm
+                  shadow-md bg-indigo-900 text-white
+                  hover:bg-indigo-700 active:scale-95
+                  disabled:opacity-90 disabled:cursor-not-allowed
+                  transition-all
+                "
+              >
+                {isUploading ? (
+                  <Loader className="animate-spin h-4 w-4 text-white" />
+                ) : (
+                  "Upload"
+                )}
+              </button>
+            </div>
           </form>
         </details>
 
         <h2 className="text-3xl font-extrabold pt-4">
           All Saved Links{" "}
           <span className="font-medium text-amber-400">
-
-            ({bookmarks.length})
+            ({filteredBookmarks.length}
+            {selectedTags.length ? ` of ${bookmarks.length}` : ""})
           </span>
         </h2>
 
-        {bookmarks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {bookmarks.map((bm) => (
-              <BookmarkCard
-                key={bm._id}
-                bm={bm}
-                onEdit={handleOpenEditModal}
-                onDelete={handleDelete}
-                darkMode={darkMode}
-              />
-            ))}
-          </div>
-        ) : (
+        {bookmarks.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center bg-purple-50 dark:bg-purple-800/80 p-12 rounded-3xl shadow-inner border-2 border-purple-600 mt-6">
             <img
               src="https://stories.freepiklabs.com/api/vectors/bookmarks/amico/render?color=&background=complete"
@@ -307,17 +357,32 @@ function Dashboard({ darkMode, setDarkMode }) {
               + Add Bookmark
             </button>
           </div>
+        ) : filteredBookmarks.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {filteredBookmarks.map((bm) => (
+              <BookmarkCard
+                key={bm._id}
+                bm={bm}
+                onEdit={handleOpenEditModal}
+                onDelete={handleDelete}
+                darkMode={darkMode}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 text-sm text-gray-600 dark:text-gray-300">
+            No bookmarks match the selected tags.
+          </div>
         )}
 
-   
-<FormModal
-  isOpen={isModalOpen}
-  onClose={closeModal}
-  bookmarkToEdit={bookmarkToEdit}
-  onSave={handleSaveOrUpdate}  
-  setGlobalMessage={setUploadMessage}  
-  API_BASE_URL={API_BASE_URL} 
-/>
+        <FormModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          bookmarkToEdit={bookmarkToEdit}
+          onSave={handleSaveOrUpdate}
+          setGlobalMessage={setUploadMessage}
+          API_BASE_URL={API_BASE_URL}
+        />
       </div>
     </div>
   );
