@@ -68,7 +68,7 @@ const Login = () => {
           <h1 className="text-3xl font-extrabold text-center text-purple-700 dark:text-purple-300 mb-2">
             Welcome back
           </h1>
-          <h2 className="text-2xl font-bold text-center text-indigo-600 dark:text-indigo-400 mb-1 relative">
+          <h2 className="text-2xl font-bold text-center text-indigo-600 dark:text-indigo-900 mb-1 relative">
             Login to{" "}
             <span className="relative text-purple-600 dark:text-purple-400">
               B-link

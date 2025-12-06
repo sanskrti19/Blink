@@ -9,7 +9,7 @@ const Hero = () => {
         
         
         <h1 className="text-7xl md:text-8xl font-extrabold mb-6 leading-tight
-        text-indigo-400">
+        text-indigo-900">
           One place for all your 
           <span className="text-indigo-600 block sm:inline-block"> Chrome Bookmarks.</span>
         </h1>

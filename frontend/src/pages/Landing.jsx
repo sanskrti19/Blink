@@ -10,7 +10,7 @@ const Landing = () => {
 
        
       <div className="absolute w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float top-10 left-10"></div>
-      <div className="absolute w-64 h-64 bg-indigo-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-float animation-delay-2000 top-32 right-20"></div>
+      <div className="absolute w-64 h-64 bg-indigo-900 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-float animation-delay-2000 top-32 right-20"></div>
       <div className="absolute w-48 h-48 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-20 animate-float animation-delay-4000 bottom-20 left-24"></div>
 
       

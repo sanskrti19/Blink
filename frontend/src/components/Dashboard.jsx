@@ -20,9 +20,8 @@ function Dashboard({ darkMode, setDarkMode }) {
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
   const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => {
-        setIsModalOpen(false);
-        setBookmarkToEdit(null);  
+  const closeModal = () => {setIsModalOpen(false);
+     setBookmarkToEdit(null);  
     };
 
      
@@ -245,12 +244,12 @@ function Dashboard({ darkMode, setDarkMode }) {
             <button
               type="submit"
               disabled={!file || isUploading}
-              className="w-full py-3 px-6 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center bg-indigo-600 hover:bg-indigo-700"
+              className="w-30% py-3 px-6 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center bg-indigo-600 hover:bg-indigo-900"
             >
               {isUploading ? (
                 <Loader className="animate-spin h-5 w-5 mr-3 text-white" />
               ) : (
-                "Start Upload and Save"
+                " Upload and Save"
               )}
             </button>
           </form>
@@ -258,7 +257,8 @@ function Dashboard({ darkMode, setDarkMode }) {
 
         <h2 className="text-3xl font-extrabold pt-4">
           All Saved Links{" "}
-          <span className="font-medium text-indigo-300">
+          <span className="font-medium text-amber-400">
+
             ({bookmarks.length})
           </span>
         </h2>

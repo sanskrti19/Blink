@@ -23,7 +23,7 @@ const SideNav = ({
 
   const handleTagsClick = () => setIsTagDropdownOpen(!isTagDropdownOpen);
 
-  // ✅ Group tags by color
+   
   const groupedTags = tags.reduce((acc, tag) => {
     if (!acc[tag.color]) acc[tag.color] = [];
     acc[tag.color].push(tag);
@@ -45,8 +45,7 @@ const SideNav = ({
         />
         {!isCollapsed && <h1 className="text-3xl font-extrabold text-gray-900 tracking-wider">B-link</h1>}
       </div>
-
-      {/* Collapse Button */}
+ 
       <div className={`flex items-center ${isCollapsed ? "justify-center flex-col" : "justify-end"} gap-2 mb-4`}>
         <button
           onClick={toggleCollapse}
@@ -58,15 +57,7 @@ const SideNav = ({
       </div>
 
       <nav className="flex-1 flex flex-col space-y-2">
-         
-        {/* <button
-          onClick={() => navigate("/")}
-          className="flex items-center p-3 rounded-xl bg-white hover:bg-purple-100 text-gray-700 transition duration-200 font-semibold"
-        >
-          <Home className="w-5 h-5" />
-          {!isCollapsed && <span className="ml-3 font-semibold">Dashboard</span>}
-        </button> */}
-
+          
         
         <div>
           <button
@@ -128,8 +119,7 @@ const SideNav = ({
           className={`transition-all duration-300 ${isCollapsed ? "w-10 h-10 opacity-70" : "w-20 h-20 opacity-80"}`}
         />
       </div>
-
-      {/* Logout */}
+ 
       <button
         onClick={onLogout}
         className="flex items-center p-3 mt-auto bg-red-600 rounded-xl hover:bg-red-700 transition duration-200 font-semibold shadow-lg text-white"
