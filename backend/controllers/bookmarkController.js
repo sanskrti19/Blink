@@ -95,3 +95,71 @@ export const uploadBookmarks = async (req, res) => {
     return res.status(500).json({ message: "Failed to parse and save bookmarks." });
   }
 };
+
+export const updateBookmark = async (req, res) => {
+  if (!req.user || !req.user.userId) {
+    return res.status(401).json({ message: "Authentication required." });
+  }
+
+  try {
+    const { id } = req.params;
+    const { title, url, folder, tags, description } = req.body;
+
+    const updateData = {
+      title,
+      url,
+      folder: folder || "Uncategorized",
+      description
+    };
+
+    if (tags) {
+      updateData.tags = tags;
+    } else {
+      const category = categorizeBookmark(url, title);
+      updateData.tags = [{ name: category, color: getTagColor(category) }];
+    }
+
+    const updatedBookmark = await Bookmark.findOneAndUpdate(
+      { _id: id, user: req.user.userId },
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedBookmark) {
+      return res.status(404).json({ message: "Bookmark not found or unauthorized to update." });
+    }
+
+    return res.status(200).json(updatedBookmark);
+  } catch (error) {
+    console.error("Error updating bookmark:", error);
+    return res.status(400).json({ message: "Failed to update bookmark.", error: error.message });
+  }
+};
+
+
+
+
+export const deleteBookmark = async (req, res) => {
+  if (!req.user || !req.user.userId) {
+    return res.status(401).json({ message: "Authentication required." });
+  }
+
+  try {
+    const { id } = req.params;
+
+    const deletedBookmark = await Bookmark.findOneAndDelete({
+      _id: id,
+      user: req.user.userId
+    });
+
+    if (!deletedBookmark) {
+      return res.status(404).json({ message: "Bookmark not found or you are unauthorized to delete it." });
+    }
+
+    return res.status(200).json({ message: "Bookmark deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting bookmark:", error);
+    return res.status(500).json({ message: "Failed to delete bookmark due to a server error." });
+  }
+};
+

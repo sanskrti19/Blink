@@ -96,7 +96,7 @@ function Dashboard({ darkMode, setDarkMode }) {
       console.error(error);
       setUploadMessage({
         type: "error",
-        text: `Failed to delete: ${error.response?.data?.message || "Check console."}`,
+        text: `Failed to delete: ${error.response?.data?.message || "Retry"}`,
       });
     } finally {
       setTimeout(() => setUploadMessage({ type: "", text: "" }), 3000);
@@ -230,28 +230,42 @@ function Dashboard({ darkMode, setDarkMode }) {
           <form
             onSubmit={handleUploadSubmit}
             className="mt-6 space-y-5 border-t pt-5 border-gray-200 dark:border-purple-600"
-          >
-            <label className="block text-sm font-medium">
-              Select .html file:
-            </label>
-            <input
-              type="file"
-              accept=".html"
-              onChange={handleFileChange}
-              disabled={isUploading}
-              className="block w-full text-sm transition-colors duration-300"
-            />
-            <button
-              type="submit"
-              disabled={!file || isUploading}
-              className="w-30% py-3 px-6 rounded-xl font-bold text-lg transition-all shadow-lg flex items-center justify-center bg-indigo-600 hover:bg-indigo-900"
-            >
-              {isUploading ? (
-                <Loader className="animate-spin h-5 w-5 mr-3 text-white" />
-              ) : (
-                " Upload and Save"
-              )}
-            </button>
+          >    
+            <div className="flex items-center gap-4 mt-4">
+  <input
+    type="file"
+    accept=".html"
+    onChange={handleFileChange}
+    disabled={isUploading}
+    className="
+      block w-60 text-sm font-medium 
+      px-3 py-2 
+      rounded-lg border border-gray-300 
+      bg-white text-gray-800
+      dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100
+      transition-all
+    "
+  />
+
+  <button
+    type="submit"
+    disabled={!file || isUploading}
+    className="
+      py-2 px-5 rounded-lg font-semibold text-sm
+      shadow-md bg-indigo-900 text-white
+      hover:bg-indigo-700 active:scale-95
+      disabled:opacity-90 disabled:cursor-not-allowed
+      transition-all
+    "
+  >
+    {isUploading ? (
+      <Loader className="animate-spin h-4 w-4 text-white" />
+    ) : (
+      "Upload"
+    )}
+  </button>
+</div>
+
           </form>
         </details>
 
