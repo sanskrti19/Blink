@@ -260,9 +260,9 @@ function Dashboard({ darkMode, setDarkMode }) {
               Manage your collection of {bookmarks.length} saved links.
             </p>
             {selectedTags.length > 0 && (
-              <p className="text-sm text-purple-700 mt-1">
-                Filtering by tags: {selectedTags.join(", ")} (
-                {filteredBookmarks.length} shown)
+              <p className="text-sm text-black-900 mt-1">
+                 {selectedTags.join(", ")} (
+                {filteredBookmarks.length} )
               </p>
             )}
           </div>
