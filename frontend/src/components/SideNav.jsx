@@ -10,6 +10,8 @@ import {
   ChevronUp
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
+
 
 const SideNav = ({
   onAddClick,
@@ -22,15 +24,18 @@ const SideNav = ({
 }) => {
   const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
   const navigate = useNavigate();
+    const { mode, toggleTheme } = useTheme();
+  const isDark = mode === "dark";
 
   const handleTagsClick = () => setIsTagDropdownOpen(!isTagDropdownOpen);
 
   return (
     <aside
-      className={`${
-        isCollapsed ? "w-20 items-center" : "w-64"
-      } min-h-screen bg-white text-gray-900 shadow-xl border-r border-purple-900 flex flex-col p-4 space-y-8 transition-all duration-300`}
-    >
+  className={`${
+    isCollapsed ? "w-20 items-center" : "w-64"
+  } min-h-screen bg-white text-gray-900 dark:bg-[#050017] dark:text-gray-100 shadow-xl border-r border-purple-900 flex flex-col p-4 space-y-8 transition-all duration-300`}
+>
+
       <div
         className={`flex flex-col items-center ${
           isCollapsed ? "space-y-3" : "space-y-2"
@@ -49,24 +54,33 @@ const SideNav = ({
           </h1>
         )}
       </div>
+<div
+  className={`flex items-center ${
+    isCollapsed ? "justify-center flex-col" : "justify-end"
+  } gap-2 mb-4`}
+>
+ 
+  <button
+    onClick={toggleTheme}
+    className="p-2 rounded-full border border-purple-200 hover:bg-purple-50 text-purple-700 text-xs font-semibold transition-colors"
+    title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+  >
+    {isDark ? "☀️" : "🌙"}
+  </button>
 
-      <div
-        className={`flex items-center ${
-          isCollapsed ? "justify-center flex-col" : "justify-end"
-        } gap-2 mb-4`}
-      >
-        <button
-          onClick={toggleCollapse}
-          className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 transition-colors"
-          title={isCollapsed ? "Expand" : "Collapse"}
-        >
-          {isCollapsed ? (
-            <ChevronRight className="w-5 h-5" />
-          ) : (
-            <ChevronLeft className="w-5 h-5" />
-          )}
-        </button>
-      </div>
+   
+  <button
+    onClick={toggleCollapse}
+    className="p-1 rounded-full bg-purple-100 hover:bg-purple-200 text-purple-700 transition-colors"
+    title={isCollapsed ? "Expand" : "Collapse"}
+  >
+    {isCollapsed ? (
+      <ChevronRight className="w-5 h-5" />
+    ) : (
+      <ChevronLeft className="w-5 h-5" />
+    )}
+  </button>
+</div>
 
      <nav className="flex-1 flex flex-col space-y-2">
  
@@ -88,7 +102,8 @@ const SideNav = ({
       </button>
 
       {isTagDropdownOpen && (
-        <div className="bg-white shadow-md rounded-lg mt-2 p-3 max-h-64 overflow-y-auto flex flex-wrap gap-2">
+  <div className="bg-white dark:bg-purple-900 shadow-md rounded-lg mt-2 p-3 max-h-64 overflow-y-auto flex flex-wrap gap-2">
+
           {tags.map((tag) => {
             const isActive = selectedTags.includes(tag.name);
             return (

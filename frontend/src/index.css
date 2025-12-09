@@ -1,7 +1,6 @@
 @import "tailwindcss";
-@reference "tailwindcss"; /* ✅ Required for Tailwind + Vite setup */
-
-/* 🌞 Light mode defaults */
+@reference "tailwindcss";  
+ 
 body {
   @apply bg-[#faf8f5] text-gray-900 font-sans antialiased;
 }
@@ -14,7 +13,7 @@ body {
   @apply outline-none ring-2 ring-indigo-900 ring-offset-2;
 }
 
-/* 🌙 Custom dark theme overrides */
+ 
 :root {
   --bg-primary: #f8fafc;
   --bg-secondary: #e2e8f0;
@@ -31,4 +30,13 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   transition: background-color 0.3s, color 0.3s;
+}
+:root {
+  --bg-primary: #f7f2ff;    
+  --text-primary: #111827;  
+}
+
+.dark {
+  --bg-primary: #050017;    
+  --text-primary: #f9fafb;  
 }

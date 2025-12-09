@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ILLUSTATION } from "../utils/constant";
+import { User } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -66,7 +67,7 @@ const Login = () => {
                         bg-white/90 dark:bg-purple-900/70 backdrop-blur-xl
                         border-purple-200 dark:border-purple-800 transition-all duration-500">
           <h1 className="text-3xl font-extrabold text-center text-purple-700 dark:text-purple-300 mb-2">
-            Welcome back
+            Welcome back 
           </h1>
           <h2 className="text-2xl font-bold text-center text-indigo-600 dark:text-indigo-900 mb-1 relative">
             Login to{" "}

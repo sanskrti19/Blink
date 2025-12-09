@@ -4,12 +4,17 @@ import axios from "axios";
 import FormModal from "./FormModal";
 import BookmarkCard from "./BookmarkCard";
 import SideNav from "./SideNav";
+import { useTheme } from "../context/ThemeContext";
+
 
 import { Loader, UploadCloud, ChevronDown } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
-function Dashboard({ darkMode, setDarkMode }) {
+function Dashboard() {
+  const { mode } = useTheme();
+  const darkMode = mode === "dark";  
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,7 +25,7 @@ function Dashboard({ darkMode, setDarkMode }) {
   const [uploadMessage, setUploadMessage] = useState({ type: "", text: "" });
   const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
 
-  // NEW: multi-tag filter state
+   
   const [selectedTags, setSelectedTags] = useState([]);
 
   const openModal = () => setIsModalOpen(true);
@@ -128,8 +133,7 @@ function Dashboard({ darkMode, setDarkMode }) {
     const token = localStorage.getItem("token");
     const formData = new FormData();
 
-    // NOTE: backend expects req.file; make sure field name here
-    // matches upload.single("bookmarkFile") or upload.single("file") in your route
+  
     formData.append("bookmarkFile", file);
 
     try {
@@ -185,9 +189,9 @@ function Dashboard({ darkMode, setDarkMode }) {
     }
   };
 
-  // 🔹 Build unique tags list for sidebar from bookmarks
+ 
   const tagsForSidebar = useMemo(() => {
-    const tagMap = new Map(); // key = name|color -> { name, color, count }
+    const tagMap = new Map();  
 
     bookmarks.forEach((bm) => {
       (bm.tags || []).forEach((tag) => {
@@ -196,7 +200,7 @@ function Dashboard({ darkMode, setDarkMode }) {
         if (!tagMap.has(key)) {
           tagMap.set(key, {
             name: tag.name,
-            color: tag.color || "#a855f7", // fallback purple
+            color: tag.color || "#a855f7", 
             count: 1,
           });
         } else {
@@ -208,15 +212,14 @@ function Dashboard({ darkMode, setDarkMode }) {
     return Array.from(tagMap.values());
   }, [bookmarks]);
 
-  // 🔹 Multi-tag filter: OR logic
+ 
   const filteredBookmarks = useMemo(() => {
     if (!selectedTags.length) return bookmarks;
     return bookmarks.filter((bm) =>
       (bm.tags || []).some((tag) => selectedTags.includes(tag.name))
     );
   }, [bookmarks, selectedTags]);
-
-  // 🔹 Toggle tag selection (multi-select)
+ 
   const handleToggleTag = (tagName) => {
     setSelectedTags((prev) =>
       prev.includes(tagName)
@@ -235,18 +238,18 @@ function Dashboard({ darkMode, setDarkMode }) {
   }
 
   return (
-    <div className="flex min-h-screen transition-colors duration-500 text-gray-900 dark:bg-purple-650 dark:text-dark- purple relative">
+    <div className="flex min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-500 relative">
+
       <SideNav
-        onAddClick={handleOpenCreateModal}
-        onLogout={handleLogout}
-        isCollapsed={isCollapsed}
-        toggleCollapse={toggleCollapse}
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        tags={tagsForSidebar}
-        selectedTags={selectedTags}
-        onToggleTag={handleToggleTag}
-      />
+  onAddClick={handleOpenCreateModal}
+  onLogout={handleLogout}
+  isCollapsed={isCollapsed}
+  toggleCollapse={toggleCollapse}
+  tags={tagsForSidebar}
+  selectedTags={selectedTags}
+  onToggleTag={handleToggleTag}
+/>
+
 
       <div
         className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${
