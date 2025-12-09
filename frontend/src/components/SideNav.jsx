@@ -30,11 +30,12 @@ const SideNav = ({
   const handleTagsClick = () => setIsTagDropdownOpen(!isTagDropdownOpen);
 
   return (
-    <aside
+   <aside
   className={`${
     isCollapsed ? "w-20 items-center" : "w-64"
-  } min-h-screen bg-white text-gray-900 dark:bg-[#050017] dark:text-gray-100 shadow-xl border-r border-purple-900 flex flex-col p-4 space-y-8 transition-all duration-300`}
+  } min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] shadow-xl border-r border-purple-900 flex flex-col p-4 space-y-8 transition-colors duration-300`}
 >
+
 
       <div
         className={`flex flex-col items-center ${
@@ -49,7 +50,7 @@ const SideNav = ({
           }`}
         />
         {!isCollapsed && (
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-wider">
+           <h1 className="text-3xl font-extrabold tracking-wider text-[var(--text-primary)]">
             B-link
           </h1>
         )}
