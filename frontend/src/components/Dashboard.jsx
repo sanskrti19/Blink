@@ -179,14 +179,14 @@ function Dashboard() {
   const getMessageStyle = () => {
     switch (uploadMessage.type) {
       case "error":
-        return "text-red-700 bg-red-100 border-red-300 dark:text-red-300 dark:bg-red-900/50 dark:border-red-700";
+        return "text-red-600 bg-red-100 border-red-300 dark:text-red-300 dark:bg-red-900/50 dark:border-red-700";
       case "success":
         return "text-green-700 bg-green-100 border-green-300 dark:text-green-300 dark:bg-green-900/50 dark:border-green-700";
       case "info":
         return "text-indigo-700 bg-indigo-100 border-indigo-300 dark:text-indigo-300 dark:bg-indigo-900/50 dark:border-indigo-700";
       default:
         return "text-gray-700 bg-gray-100 border-gray-300 dark:text-gray-300 dark:bg-gray-700/50 dark:border-gray-500";
-    }
+    }   
   };
 
  
@@ -253,7 +253,7 @@ function Dashboard() {
 
       <div
         className={`flex-1 p-6 sm:p-12 space-y-8 overflow-auto transition-all duration-300 ${
-          isCollapsed ? "pl-8" : "pl-16"
+          isCollapsed ? "pl-8" : "pl-6"
         }`}
       >
         <div className="flex justify-between items-center flex-wrap gap-6">
@@ -295,7 +295,7 @@ function Dashboard() {
 
           <form
             onSubmit={handleUploadSubmit}
-            className="mt-6 space-y-5 border-t pt-5 border-gray-200 dark:border-purple-600"
+            className="mt-6 space-y-3 border-t pt-5 border-gray-200 dark:border-purple-600"
           >
             <div className="flex items-center gap-4 mt-4">
               <input
@@ -305,7 +305,7 @@ function Dashboard() {
                 disabled={isUploading}
                 className="
                   block w-60 text-sm font-medium 
-                  px-3 py-2 
+                  px-2 py-1 
                   rounded-lg border border-gray-300 
                   bg-white text-gray-800
                   dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100
@@ -361,7 +361,7 @@ function Dashboard() {
             </button>
           </div>
         ) : filteredBookmarks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-19">
             {filteredBookmarks.map((bm) => (
               <BookmarkCard
                 key={bm._id}

@@ -12,6 +12,26 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        if (!payload || (payload.exp && Date.now() >= payload.exp * 1000)) {
+           
+          localStorage.removeItem("token");
+          localStorage.removeItem("name");
+        } else {
+          navigate("/login", { replace: true });
+        }
+      } catch (e) {
+         
+        localStorage.removeItem("token");
+        localStorage.removeItem("name");
+      }
+    }
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
