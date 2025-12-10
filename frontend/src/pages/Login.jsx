@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ILLUSTATION } from "../utils/constant";
 import { User } from "lucide-react";

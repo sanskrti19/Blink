@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LOGIN_ILLUSTATION } from "../utils/constant";
+import { useEffect } from "react";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -12,6 +13,7 @@ const Signup = () => {
   const nameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -51,6 +53,26 @@ const Signup = () => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      if (payload?.exp && Date.now() >= payload.exp * 1000) {
+         
+        localStorage.removeItem("token");
+        localStorage.removeItem("name");
+      } else {
+        navigate("/home", { replace: true });
+      }
+    } catch {
+      
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+    }
+  }
+}, [navigate]);
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-500">
@@ -66,7 +88,7 @@ const Signup = () => {
         />
       </div>
 
-      {/* Signup Form */}
+ 
       <div className="w-full md:w-1/2 flex items-center justify-center
                       bg-[var(--bg-primary)] dark:bg-[var(--bg-primary)] transition-colors duration-500">
         <div className="w-full max-w-md p-8 rounded-2xl shadow-lg border

@@ -1,30 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./components/Dashboard";
-import PrivateRoute from "./components/PrivateRoute";
- 
- 
-function App() {
-  
-  
 
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute"; // 👈 ADD THIS
+
+function App() {
   return (
     <Router>
-       
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route element={<PrivateRoute />}>
-         <Route path="/home" element={<Dashboard />} />
-</Route>
+      <Routes>
+ 
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Landing />
+            </PublicRoute>
+          }
+        />
 
-          <Route path="*" element={<Landing />} />
-        </Routes>
-       
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
+ 
+        <Route element={<PrivateRoute />}>
+          <Route path="/home" element={<Dashboard />} />
+        </Route>
+ 
+        <Route path="*" element={<Landing />} />
+      </Routes>
     </Router>
   );
 }
